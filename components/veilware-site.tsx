@@ -6,7 +6,7 @@ import { ArrowDown, ArrowRight, Bell, Box, ChevronDown, Code2, Cpu, EyeOff, Head
 const crimson = '#ff334a'
 const DISCORD_INVITE = 'https://discord.com/invite/P9Rkd2KMPD'
 const DISCORD_LOGO = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-4LolVsSvYyHrC4rH84SEg61GsA01Dh.png'
-const VEILWARE_LOGO = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/9242e430-1360-46fa-9351-1fa170562f7e-4yGdUml6kjIYGumu8qxr9ZS0vy3ELw.png'
+const VEILWARE_LOGO = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/9242e430-1360-46fa-9351-1fa170562f7e-RUNH1ejiJItyIHQwpvAUWXyHg9LXtJ.png'
 
 const features = [
   { icon: ShieldCheck, title: 'Undetected by Design', copy: 'Built with stealth-first architecture to stay ahead of detection systems.' },
