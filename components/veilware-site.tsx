@@ -4,6 +4,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { ArrowDown, ArrowRight, Bell, Box, ChevronDown, Code2, Cpu, EyeOff, Headphones, LockKeyhole, Menu, RefreshCw, ShieldCheck, Sparkles, Zap } from 'lucide-react'
 
 const crimson = '#ff334a'
+const DISCORD_INVITE = 'https://discord.com/invite/P9Rkd2KMPD'
+const DISCORD_LOGO = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-4LolVsSvYyHrC4rH84SEg61GsA01Dh.png'
+const VEILWARE_LOGO = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/9242e430-1360-46fa-9351-1fa170562f7e-4yGdUml6kjIYGumu8qxr9ZS0vy3ELw.png'
 
 const features = [
   { icon: ShieldCheck, title: 'Undetected by Design', copy: 'Built with stealth-first architecture to stay ahead of detection systems.' },
@@ -32,7 +35,7 @@ const faqs = [
 ]
 
 function Logo() {
-  return <a href="#home" className="brand" aria-label="Veilware home"><span className="brand-mark">⌄</span><span>VEIL<span>WARE</span></span></a>
+  return <a href="#home" className="brand" aria-label="Veilware home"><img src={VEILWARE_LOGO} alt="Veilware logo" /><span>VEIL<span>WARE</span></span></a>
 }
 
 function ScrollReveal({ children, className = '' }: { children: React.ReactNode; className?: string }) {
@@ -43,12 +46,16 @@ export default function VeilwareSite() {
   const [activeFaq, setActiveFaq] = useState<number | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const [cursor, setCursor] = useState({ x: -100, y: -100 })
+  const [cursorReady, setCursorReady] = useState(false)
   const squares = useMemo(() => Array.from({ length: 44 }, (_, i) => ({
-    left: `${(i * 47 + 9) % 101}%`, top: `${(i * 71 + 3) % 98}%`, size: 7 + ((i * 13) % 18), delay: `${-(i * 0.73)}s`, duration: `${15 + (i % 11) * 2.2}s`, drift: `${(i % 2 ? 1 : -1) * (8 + i % 18)}px`, rotate: `${(i % 2 ? 1 : -1) * (20 + i * 7)}deg`, opacity: 0.16 + (i % 4) * 0.06,
+    left: `${(i * 47 + 9) % 101}%`, top: `${(i * 71 + 3) % 98}%`, size: 7 + ((i * 13) % 18), delay: `${-(i * 0.73)}s`, duration: `${8 + (i % 11) * 1.25}s`, drift: `${(i % 2 ? 1 : -1) * (8 + i % 18)}px`, rotate: `${(i % 2 ? 1 : -1) * (20 + i * 7)}deg`, opacity: 0.16 + (i % 4) * 0.06,
   })), [])
 
   useEffect(() => {
-    const move = (event: MouseEvent) => setCursor({ x: event.clientX, y: event.clientY })
+    const move = (event: MouseEvent) => {
+      setCursor({ x: event.clientX, y: event.clientY })
+      setCursorReady(true)
+    }
     window.addEventListener('mousemove', move)
     const observer = new IntersectionObserver(entries => entries.forEach(entry => entry.isIntersecting && entry.target.classList.add('is-visible')), { threshold: 0.12 })
     document.querySelectorAll('.reveal').forEach(element => observer.observe(element))
@@ -58,10 +65,10 @@ export default function VeilwareSite() {
   const go = (id: string) => { setMenuOpen(false); document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }) }
 
   return <main className="veilware-site">
-    <div className="cursor" style={{ transform: `translate(${cursor.x}px, ${cursor.y}px)` }} aria-hidden="true"><i /></div>
-    <header className="site-header"><div className="nav-wrap"><Logo /><nav className={menuOpen ? 'open' : ''} aria-label="Main navigation">{[['home','Home'],['features','Features'],['products','Products'],['updates','Updates'],['faq','FAQ'],['support','Support']].map(([id, label]) => <button key={id} onClick={() => go(id)}>{label}</button>)}</nav><button className="discord small" onClick={() => go('support')}>◉ <span>Join Discord</span></button><button className="menu-button" onClick={() => setMenuOpen(v => !v)} aria-label="Toggle menu"><Menu size={21} /></button></div></header>
+    <div className={`cursor ${cursorReady ? 'ready' : ''}`} style={{ transform: `translate(${cursor.x}px, ${cursor.y}px)` }} aria-hidden="true"><i /></div>
+    <header className="site-header"><div className="nav-wrap"><Logo /><nav className={menuOpen ? 'open' : ''} aria-label="Main navigation">{[['home','Home'],['features','Features'],['products','Products'],['updates','Updates'],['faq','FAQ'],['support','Support']].map(([id, label]) => <button key={id} onClick={() => go(id)}>{label}</button>)}</nav><a className="discord small" href={DISCORD_INVITE} target="_blank" rel="noreferrer"> <img src={DISCORD_LOGO} alt="" /> <span>Join Discord</span></a><button className="menu-button" onClick={() => setMenuOpen(v => !v)} aria-label="Toggle menu"><Menu size={21} /></button></div></header>
 
-    <section id="home" className="hero"><div className="hero-effects" aria-hidden="true"><div className="orb orb-a" /><div className="orb orb-b" />{squares.map((square, i) => <span key={i} className="floating-square" style={{ left: square.left, top: square.top, width: square.size, height: square.size, animationDelay: square.delay, animationDuration: square.duration, ['--drift' as string]: square.drift, ['--rotate' as string]: square.rotate, opacity: square.opacity }} />)}</div><div className="grid-lines" aria-hidden="true" /><div className="hero-content"><div className="hero-emblem">⌄</div><h1><span>VEIL</span><b>WARE</b></h1><p className="hero-tagline">Best <em>undetected</em> softwares.</p><p className="hero-copy">Welcome to the Veilware community. We build premium,<br className="desktop" /> undetected software with a relentless focus on quality, privacy, and performance.</p><div className="hero-actions"><button className="discord" onClick={() => go('support')}>◉ &nbsp; Join Our Discord</button><button className="outline-button" onClick={() => go('features')}>Explore <ArrowDown size={16} /></button></div><div className="trust"><ShieldCheck size={14} /> PRIVACY-FIRST <span>•</span> COMMUNITY-DRIVEN</div></div><button className="scroll-cue" onClick={() => go('features')} aria-label="Scroll to features"><span /></button></section>
+    <section id="home" className="hero"><div className="hero-effects" aria-hidden="true"><div className="orb orb-a" /><div className="orb orb-b" />{squares.map((square, i) => <span key={i} className="floating-square" style={{ left: square.left, top: square.top, width: square.size, height: square.size, animationDelay: square.delay, animationDuration: square.duration, ['--drift' as string]: square.drift, ['--rotate' as string]: square.rotate, opacity: square.opacity }} />)}</div><div className="grid-lines" aria-hidden="true" /><div className="hero-content"><div className="hero-emblem">⌄</div><h1><span>VEIL</span><b>WARE</b></h1><p className="hero-tagline">Best <em>undetected</em> softwares.</p><p className="hero-copy">Welcome to the Veilware community. We build premium,<br className="desktop" /> undetected software with a relentless focus on quality, privacy, and performance.</p><div className="hero-actions"><a className="discord" href={DISCORD_INVITE} target="_blank" rel="noreferrer"><img src={DISCORD_LOGO} alt="" /> Join Our Discord</a><button className="outline-button" onClick={() => go('features')}>Explore <ArrowDown size={16} /></button></div><div className="trust"><ShieldCheck size={14} /> PRIVACY-FIRST <span>•</span> COMMUNITY-DRIVEN</div></div><button className="scroll-cue" onClick={() => go('features')} aria-label="Scroll to features"><span /></button></section>
 
     <section id="features" className="section feature-section"><ScrollReveal className="section-heading"><div className="eyebrow">● &nbsp; FEATURES</div><h2>Engineered to stay <em>invisible</em></h2><p>Every Veilware product is built around the same promise — reliable,<br className="desktop" /> undetected, and crafted with care.</p></ScrollReveal><div className="feature-grid">{features.map(({ icon: Icon, title, copy }, i) => <ScrollReveal className="feature-card" key={title}><div className="icon-box"><Icon size={21} /></div><h3>{title}</h3><p>{copy}</p></ScrollReveal>)}</div></section>
 
@@ -69,10 +76,10 @@ export default function VeilwareSite() {
 
     <section id="updates" className="section updates-section"><ScrollReveal className="section-heading"><div className="eyebrow">● &nbsp; UPDATES</div><h2>No <em>updates</em> yet</h2><p>There is nothing new to share right now. Announcements will appear here<br className="desktop" /> when they are ready.</p></ScrollReveal><ScrollReveal className="empty-card"><div className="icon-box"><Bell size={22} /></div><p>Keep an eye on the Veilware Discord for the first product and community announcements.</p></ScrollReveal></section>
 
-    <section id="faq" className="section faq-section"><ScrollReveal className="section-heading"><div className="eyebrow">● &nbsp; FAQ</div><h2>Questions, <em>answered</em></h2><p>Everything you need to know before joining the Veilware community.</p></ScrollReveal><div className="faq-list">{faqs.map(([question, answer], i) => <ScrollReveal className={`faq-item ${activeFaq === i ? 'active' : ''}`} key={question}><button onClick={() => setActiveFaq(activeFaq === i ? null : i)} aria-expanded={activeFaq === i}><span>{question}</span><span className="plus">+</span></button>{activeFaq === i && <p>{answer}</p>}</ScrollReveal>)}</div></section>
+    <section id="faq" className="section faq-section"><ScrollReveal className="section-heading"><div className="eyebrow">● &nbsp; FAQ</div><h2>Questions, <em>answered</em></h2><p>Everything you need to know before joining the Veilware community.</p></ScrollReveal><div className="faq-list">{faqs.map(([question, answer], i) => <ScrollReveal className={`faq-item ${activeFaq === i ? 'active' : ''}`} key={question}><button type="button" onClick={() => setActiveFaq(activeFaq === i ? null : i)} aria-expanded={activeFaq === i} aria-controls={`faq-answer-${i}`}><span>{question}</span><span className="plus" aria-hidden="true">+</span></button><div id={`faq-answer-${i}`} className="faq-answer"><p>{answer}</p></div></ScrollReveal>)}</div></section>
 
-    <section id="support" className="support-section"><ScrollReveal className="support-card"><div className="support-icon">◉</div><div className="eyebrow">● &nbsp; COMMUNITY</div><h2>Join the Veilware <em>Discord</em></h2><p>Talk directly with the team, get fast support, and be the first to hear<br className="desktop" /> about new releases. Our community is where everything happens.</p><button className="discord" onClick={() => window.open('https://discord.com', '_blank', 'noopener,noreferrer')}>◉ &nbsp; Join Our Discord <ArrowRight size={16} /></button></ScrollReveal></section>
+    <section id="support" className="support-section"><ScrollReveal className="support-card"><div className="support-icon">◉</div><div className="eyebrow">● &nbsp; COMMUNITY</div><h2>Join the Veilware <em>Discord</em></h2><p>Talk directly with the team, get fast support, and be the first to hear<br className="desktop" /> about new releases. Our community is where everything happens.</p><a className="discord" href={DISCORD_INVITE} target="_blank" rel="noreferrer"><img src={DISCORD_LOGO} alt="" /> Join Our Discord <ArrowRight size={16} /></a></ScrollReveal></section>
 
-    <footer><div className="footer-wrap"><div><Logo /><p>VEILWARE builds premium, undetected software with a focus on privacy, performance, and a community that has your back.</p><button className="social" aria-label="Discord" onClick={() => go('support')}>◉</button></div><div className="footer-links"><div><small>NAVIGATION</small>{['home','features','products','updates','faq','support'].map(id => <button key={id} onClick={() => go(id)}>{id[0].toUpperCase() + id.slice(1)}</button>)}</div><div><small>RESOURCES</small><button onClick={() => go('support')}>Discord Community</button><button onClick={() => go('support')}>Support Channel</button><button onClick={() => go('updates')}>Changelog</button><button onClick={() => go('faq')}>FAQ</button></div></div></div><div className="copyright">© 2026 VEILWARE. Built with intent.</div></footer>
+    <footer><div className="footer-wrap"><div><Logo /><p>VEILWARE builds premium, undetected software with a focus on privacy, performance, and a community that has your back.</p><a className="social" aria-label="Discord" href={DISCORD_INVITE} target="_blank" rel="noreferrer"><img src={DISCORD_LOGO} alt="" /></a></div><div className="footer-links"><div><small>NAVIGATION</small>{['home','features','products','updates','faq','support'].map(id => <button key={id} onClick={() => go(id)}>{id[0].toUpperCase() + id.slice(1)}</button>)}</div><div><small>RESOURCES</small><a href={DISCORD_INVITE} target="_blank" rel="noreferrer">Discord Community</a><a href={DISCORD_INVITE} target="_blank" rel="noreferrer">Support Channel</a><button onClick={() => go('updates')}>Changelog</button><button onClick={() => go('faq')}>FAQ</button></div></div></div><div className="copyright">© 2026 VEILWARE. Built with intent.</div></footer>
   </main>
 }
