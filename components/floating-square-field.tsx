@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { isSafeSquarePosition } from './floating-square-geometry'
 
 type Particle = {
   x: number
@@ -43,13 +44,8 @@ function randomSize() {
   return SETTINGS.maxSize - Math.random() * 5
 }
 
-function overlaps(a: Particle, x: number, y: number, particles: Particle[], self: Particle | null) {
-  return particles.some((other) => {
-    if (other === self) return false
-    const horizontal = Math.abs(x - other.x) < (a.size + other.size) / 2 + SETTINGS.gap
-    const vertical = Math.abs(y - other.y) < (a.size + other.size) / 2 + SETTINGS.gap
-    return horizontal && vertical
-  })
+function overlaps(a: Particle, x: number, y: number, particles: Particle[]) {
+  return !isSafeSquarePosition(a, x, y, particles, SETTINGS.gap)
 }
 
 function createParticles(width: number, height: number) {
@@ -68,10 +64,10 @@ function createParticles(width: number, height: number) {
         targetAngle: Math.random() * Math.PI * 2,
         turnRate: 0.45 + Math.random() * 0.7,
         speed: SETTINGS.minSpeed + Math.random() * (SETTINGS.maxSpeed - SETTINGS.minSpeed),
-        alpha: 0.12 + Math.random() * 0.16,
+        alpha: 0.28 + Math.random() * 0.2,
         fill: Math.random() < 0.16,
       }
-      if (!overlaps(candidate, candidate.x, candidate.y, particles, null)) placed = candidate
+      if (!overlaps(candidate, candidate.x, candidate.y, particles)) placed = candidate
     }
     if (!placed) continue
     placed.vx = Math.cos(placed.targetAngle) * placed.speed
@@ -114,7 +110,7 @@ export function FloatingSquareField() {
       y: Math.max(particle.size / 2 + SETTINGS.gap, Math.min(height - particle.size / 2 - SETTINGS.gap, y)),
     })
 
-    const safePosition = (particle: Particle, x: number, y: number) => !overlaps(particle, x, y, particles, particle)
+    const safePosition = (particle: Particle, x: number, y: number) => !overlaps(particle, x, y, particles)
 
     const chooseSafeVelocity = (particle: Particle, nextX: number, nextY: number, step: number) => {
       const candidates = [0, 0.35, -0.35, 0.7, -0.7, 1.05, -1.05, Math.PI]
@@ -166,7 +162,7 @@ export function FloatingSquareField() {
       for (const particle of particles) {
         context.strokeStyle = `rgba(${SETTINGS.colors[particle.fill ? 1 : 0]}, ${particle.alpha})`
         context.fillStyle = `rgba(${SETTINGS.colors[1]}, ${particle.alpha * 0.22})`
-        context.lineWidth = 1
+        context.lineWidth = 1.25
         const left = particle.x - particle.size / 2
         const top = particle.y - particle.size / 2
         if (particle.fill) context.fillRect(left, top, particle.size, particle.size)

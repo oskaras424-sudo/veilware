@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "test:particles": "node --experimental-strip-types --test components/floating-square-geometry.test.ts",
     "start": "next start"
   },
   "dependencies": {
