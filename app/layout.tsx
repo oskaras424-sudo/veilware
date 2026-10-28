@@ -9,16 +9,8 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/eKXDEcLWzqlMPRNN-MsOibd4pTI8qwJopp5h67M89fpzELs.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/eKXDEcLWzqlMPRNN-MsOibd4pTI8qwJopp5h67M89fpzELs.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
+        url: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/red_v_black_background-yH1gNillAys6AEidhedTihAsmfpjbw.png',
+        type: 'image/png',
       },
     ],
     apple: '/apple-icon.png',
