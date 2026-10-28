@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
+import { FloatingSquareField } from './floating-square-field'
 import { ArrowDown, ArrowRight, Bell, Box, ChevronDown, Code2, Cpu, EyeOff, Headphones, LockKeyhole, Menu, RefreshCw, ShieldCheck, Sparkles, Zap } from 'lucide-react'
 
 const crimson = '#ff334a'
@@ -26,12 +27,12 @@ const products = [
 ]
 
 const faqs = [
-  ['Is Veilware safe to use?', 'Veilware is built with privacy, security, and responsible release practices at its core.'],
-  ['How do I get access to Veilware products?', 'Join the Discord community to get release announcements and access information.'],
-  ['How often are updates released?', 'Updates are shared when they are ready and tested by the team.'],
-  ['What if I run into a problem?', 'Our support community is available in Discord to help you troubleshoot.'],
-  ['Does Veilware store any of my data?', 'We believe your data stays yours. We do not build around telemetry or unnecessary tracking.'],
-  ['Which platforms are supported?', 'Platform support varies by release and is always listed with the relevant announcement.'],
+  ['Is Veilware safe to use?', 'Every release is signed, verified, and tested before publication. We prioritize privacy and never collect personal data. That said, using any third-party software carries some risk, and we encourage you to review our guidance in the Discord community before use.'],
+  ['How do I get access to Veilware products?', 'Join our Discord community using the invitation link on this page. From there you can follow the onboarding steps, meet the team, and get access to the products available to members.'],
+  ['How often are updates released?', 'We ship updates as soon as they are needed — whether that is a fix, a compatibility patch, or a new feature. You can always find the latest changes in the Updates section on this page.'],
+  ['What if I run into a problem?', 'Our support team and community are active in Discord. Open a ticket in the support channel and a team member will help you troubleshoot step by step.'],
+  ['Does Veilware store any of my data?', 'No. Veilware is built privacy-first. We do not track usage, collect telemetry, or store personal information. You can review our approach in the community resources.'],
+  ['Which platforms are supported?', 'Most of our tools are built for Windows first, since that is where the majority of our community plays. That said, some products may also work on Mac or Linux, so it is always worth checking the channel for whichever product you are interested in. We list supported platforms and any known quirks there, and the team is happy to confirm if you are unsure.'],
 ]
 
 function Logo() {
@@ -47,9 +48,6 @@ export default function VeilwareSite() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [cursor, setCursor] = useState({ x: -100, y: -100 })
   const [cursorReady, setCursorReady] = useState(false)
-  const squares = useMemo(() => Array.from({ length: 44 }, (_, i) => ({
-    left: `${(i * 47 + 9) % 101}%`, top: `${(i * 71 + 3) % 98}%`, size: 7 + ((i * 13) % 18), delay: `${-(i * 0.73)}s`, duration: `${8 + (i % 11) * 1.25}s`, drift: `${(i % 2 ? 1 : -1) * (8 + i % 18)}px`, rotate: `${(i % 2 ? 1 : -1) * (20 + i * 7)}deg`, opacity: 0.16 + (i % 4) * 0.06,
-  })), [])
 
   useEffect(() => {
     const move = (event: MouseEvent) => {
@@ -68,7 +66,7 @@ export default function VeilwareSite() {
     <div className={`cursor ${cursorReady ? 'ready' : ''}`} style={{ transform: `translate(${cursor.x}px, ${cursor.y}px)` }} aria-hidden="true"><i /></div>
     <header className="site-header"><div className="nav-wrap"><Logo /><nav className={menuOpen ? 'open' : ''} aria-label="Main navigation">{[['home','Home'],['features','Features'],['products','Products'],['updates','Updates'],['faq','FAQ'],['support','Support']].map(([id, label]) => <button key={id} onClick={() => go(id)}>{label}</button>)}</nav><a className="discord small" href={DISCORD_INVITE} target="_blank" rel="noreferrer"> <img src={DISCORD_LOGO} alt="" /> <span>Join Discord</span></a><button className="menu-button" onClick={() => setMenuOpen(v => !v)} aria-label="Toggle menu"><Menu size={21} /></button></div></header>
 
-    <section id="home" className="hero"><div className="hero-effects" aria-hidden="true"><div className="orb orb-a" /><div className="orb orb-b" />{squares.map((square, i) => <span key={i} className="floating-square" style={{ left: square.left, top: square.top, width: square.size, height: square.size, animationDelay: square.delay, animationDuration: square.duration, ['--drift' as string]: square.drift, ['--rotate' as string]: square.rotate, opacity: square.opacity }} />)}</div><div className="grid-lines" aria-hidden="true" /><div className="hero-content"><div className="hero-emblem">⌄</div><h1><span>VEIL</span><b>WARE</b></h1><p className="hero-tagline">Best <em>undetected</em> softwares.</p><p className="hero-copy">Welcome to the Veilware community. We build premium,<br className="desktop" /> undetected software with a relentless focus on quality, privacy, and performance.</p><div className="hero-actions"><a className="discord" href={DISCORD_INVITE} target="_blank" rel="noreferrer"><img src={DISCORD_LOGO} alt="" /> Join Our Discord</a><button className="outline-button" onClick={() => go('features')}>Explore <ArrowDown size={16} /></button></div><div className="trust"><ShieldCheck size={14} /> PRIVACY-FIRST <span>•</span> COMMUNITY-DRIVEN</div></div><button className="scroll-cue" onClick={() => go('features')} aria-label="Scroll to features"><span /></button></section>
+    <section id="home" className="hero"><div className="hero-effects" aria-hidden="true"><div className="orb orb-a" /><div className="orb orb-b" /><FloatingSquareField /></div><div className="grid-lines" aria-hidden="true" /><div className="hero-content"><img className="hero-logo" src={VEILWARE_LOGO} alt="Veilware neon V logo" /><h1><span>VEIL</span><b>WARE</b></h1><p className="hero-tagline">Best <em>undetected</em> softwares.</p><p className="hero-copy">Welcome to the Veilware community. We build premium,<br className="desktop" /> undetected software with a relentless focus on quality, privacy, and performance.</p><div className="hero-actions"><a className="discord" href={DISCORD_INVITE} target="_blank" rel="noreferrer"><img src={DISCORD_LOGO} alt="" /> Join Our Discord</a><button className="outline-button" onClick={() => go('features')}>Explore <ArrowDown size={16} /></button></div><div className="trust"><ShieldCheck size={14} /> PRIVACY-FIRST <span>•</span> COMMUNITY-DRIVEN</div></div><button className="scroll-cue" onClick={() => go('features')} aria-label="Scroll to features"><span /></button></section>
 
     <section id="features" className="section feature-section"><ScrollReveal className="section-heading"><div className="eyebrow">● &nbsp; FEATURES</div><h2>Engineered to stay <em>invisible</em></h2><p>Every Veilware product is built around the same promise — reliable,<br className="desktop" /> undetected, and crafted with care.</p></ScrollReveal><div className="feature-grid">{features.map(({ icon: Icon, title, copy }, i) => <ScrollReveal className="feature-card" key={title}><div className="icon-box"><Icon size={21} /></div><h3>{title}</h3><p>{copy}</p></ScrollReveal>)}</div></section>
 
