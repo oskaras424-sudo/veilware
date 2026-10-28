@@ -17,20 +17,7 @@ export function useMagneticPanel<T extends HTMLElement>(enabled = true, maxMovem
     let currentX = 0
     let currentY = 0
     let active = false
-
-    const move = (event: PointerEvent) => {
-      if (event.pointerType && event.pointerType !== 'mouse') return
-      const bounds = element.getBoundingClientRect()
-      targetX = Math.max(-1, Math.min(1, (event.clientX - bounds.left - bounds.width / 2) / (bounds.width / 2))) * maxMovement
-      targetY = Math.max(-1, Math.min(1, (event.clientY - bounds.top - bounds.height / 2) / (bounds.height / 2))) * maxMovement
-      active = true
-    }
-
-    const leave = () => {
-      targetX = 0
-      targetY = 0
-      active = false
-    }
+    let running = false
 
     const animate = () => {
       currentX += (targetX - currentX) * (active ? 0.2 : 0.14)
@@ -39,13 +26,39 @@ export function useMagneticPanel<T extends HTMLElement>(enabled = true, maxMovem
       if (!active && Math.abs(currentY) < 0.04) currentY = 0
       element.style.setProperty('--magnetic-x', `${currentX.toFixed(3)}px`)
       element.style.setProperty('--magnetic-y', `${currentY.toFixed(3)}px`)
+      if (!active && currentX === 0 && currentY === 0) {
+        running = false
+        frame = 0
+        return
+      }
       frame = requestAnimationFrame(animate)
+    }
+
+    const schedule = () => {
+      if (running) return
+      running = true
+      frame = requestAnimationFrame(animate)
+    }
+
+    const move = (event: PointerEvent) => {
+      if (event.pointerType && event.pointerType !== 'mouse') return
+      const bounds = element.getBoundingClientRect()
+      targetX = Math.max(-1, Math.min(1, (event.clientX - bounds.left - bounds.width / 2) / (bounds.width / 2))) * maxMovement
+      targetY = Math.max(-1, Math.min(1, (event.clientY - bounds.top - bounds.height / 2) / (bounds.height / 2))) * maxMovement
+      active = true
+      schedule()
+    }
+
+    const leave = () => {
+      targetX = 0
+      targetY = 0
+      active = false
+      schedule()
     }
 
     element.addEventListener('pointermove', move, { passive: true })
     element.addEventListener('pointerenter', move, { passive: true })
     element.addEventListener('pointerleave', leave, { passive: true })
-    frame = requestAnimationFrame(animate)
 
     return () => {
       cancelAnimationFrame(frame)

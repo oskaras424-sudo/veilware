@@ -171,25 +171,30 @@ export function FloatingSquareField() {
     }
 
     const tick = (time: number) => {
+      frame = 0
+      if (paused || reducedMotion.matches) return
       const elapsed = Math.min(SETTINGS.maxFrameSeconds, Math.max(0, (time - lastTime) / 1000))
       lastTime = time
-      if (!paused && !reducedMotion.matches) {
-        let remaining = elapsed
-        while (remaining > 0) {
-          const step = Math.min(SETTINGS.maxSubstepSeconds, remaining)
-          simulate(step)
-          remaining -= step
-        }
+      let remaining = elapsed
+      while (remaining > 0) {
+        const step = Math.min(SETTINGS.maxSubstepSeconds, remaining)
+        simulate(step)
+        remaining -= step
       }
       draw()
       frame = requestAnimationFrame(tick)
     }
 
-    const onVisibilityChange = () => { paused = document.hidden; lastTime = performance.now() }
+    const onVisibilityChange = () => {
+      paused = document.hidden
+      lastTime = performance.now()
+      if (!paused && !reducedMotion.matches && !frame) frame = requestAnimationFrame(tick)
+    }
     resize()
     document.addEventListener('visibilitychange', onVisibilityChange)
     window.addEventListener('resize', resize)
-    frame = requestAnimationFrame(tick)
+    if (reducedMotion.matches) draw()
+    else frame = requestAnimationFrame(tick)
     return () => { cancelAnimationFrame(frame); document.removeEventListener('visibilitychange', onVisibilityChange); window.removeEventListener('resize', resize) }
   }, [])
 

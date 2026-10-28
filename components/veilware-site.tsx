@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { MagneticPanel, useMagneticPanel } from './magnetic-panel'
-import { createPortal } from 'react-dom'
 import { ArrowDown, ArrowRight, Bell, Box, ChevronDown, Code2, Cpu, EyeOff, Headphones, LockKeyhole, Menu, RefreshCw, ShieldCheck, Sparkles, Zap } from 'lucide-react'
 
 const crimson = '#ff334a'
@@ -58,26 +57,41 @@ function Logo() {
 export default function VeilwareSite() {
   const [activeFaq, setActiveFaq] = useState<number | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [cursor, setCursor] = useState({ x: -100, y: -100 })
- const [cursorReady, setCursorReady] = useState(false)
- const [mounted, setMounted] = useState(false)
-
  useEffect(() => {
-  setMounted(true)
-    const move = (event: MouseEvent) => {
-      setCursor({ x: event.clientX, y: event.clientY })
-      setCursorReady(true)
-    }
-    window.addEventListener('mousemove', move)
-    const observer = new IntersectionObserver(entries => entries.forEach(entry => entry.isIntersecting && entry.target.classList.add('is-visible')), { threshold: 0.12 })
-    document.querySelectorAll('.reveal').forEach(element => observer.observe(element))
-    return () => { window.removeEventListener('mousemove', move); observer.disconnect() }
-  }, [])
+  const cursorElement = document.createElement('div')
+  cursorElement.className = 'cursor'
+  cursorElement.setAttribute('aria-hidden', 'true')
+  cursorElement.appendChild(document.createElement('i'))
+  document.body.appendChild(cursorElement)
+
+  let frame = 0
+  let pointerX = -100
+  let pointerY = -100
+  let pending = false
+  const render = () => {
+   pending = false
+   cursorElement.style.transform = `translate(${pointerX}px, ${pointerY}px)`
+  }
+  const move = (event: MouseEvent) => {
+   pointerX = event.clientX
+   pointerY = event.clientY
+   cursorElement.classList.add('ready')
+   if (!pending) {
+    pending = true
+    frame = requestAnimationFrame(render)
+   }
+  }
+  window.addEventListener('mousemove', move, { passive: true })
+  return () => {
+   window.removeEventListener('mousemove', move)
+   cancelAnimationFrame(frame)
+   cursorElement.remove()
+  }
+ }, [])
 
   const go = (id: string) => { setMenuOpen(false); document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }) }
 
   return <main className="veilware-site">
-    {mounted && createPortal(<div className={`cursor ${cursorReady ? 'ready' : ''}`} style={{ transform: `translate(${cursor.x}px, ${cursor.y}px)` }} aria-hidden="true"><i /></div>, document.body)}
     <header className="site-header"><div className="nav-wrap"><Logo /><nav className={menuOpen ? 'open' : ''} aria-label="Main navigation">{[['home','Home'],['features','Features'],['products','Products'],['updates','Updates'],['faq','FAQ'],['support','Support']].map(([id, label]) => <button key={id} onClick={() => go(id)}>{label}</button>)}</nav><a className="discord small" href={DISCORD_INVITE} target="_blank" rel="noreferrer"> <img src={DISCORD_LOGO} alt="" /> <span>Join Discord</span></a><button className="menu-button" onClick={() => setMenuOpen(v => !v)} aria-label="Toggle menu"><Menu size={21} /></button></div></header>
 
     <section id="home" className="hero"><div className="hero-effects" aria-hidden="true"><div className="orb orb-a" /><div className="orb orb-b" /></div><div className="grid-lines" aria-hidden="true" /><div className="hero-content"><img className="hero-logo" src={VEILWARE_LOGO} alt="Veilware logo" /><h1><span>VEIL</span><b>WARE</b></h1><p className="hero-tagline">Best <em>undetected</em> softwares.</p><p className="hero-copy">Welcome to the Veilware community. We build premium,<br className="desktop" /> undetected software with a relentless focus on quality, privacy, and performance.</p><div className="hero-actions"><a className="discord" href={DISCORD_INVITE} target="_blank" rel="noreferrer"><img src={DISCORD_LOGO} alt="" /> Join Our Discord</a><button className="outline-button" onClick={() => go('features')}>Explore <ArrowDown size={16} /></button></div><div className="trust"><ShieldCheck size={14} /> PRIVACY-FIRST <span>•</span> COMMUNITY-DRIVEN</div></div><button className="scroll-cue" onClick={() => go('features')} aria-label="Scroll to features"><span /></button></section>
