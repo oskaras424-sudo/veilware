@@ -1,8 +1,13 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { isSafeSquarePosition, squaresOverlap, type SquareGeometry } from './floating-square-geometry.ts'
+import { isSafeSquarePosition, squaresOverlap, viewportSpeed, type SquareGeometry } from './floating-square-geometry.ts'
 
 const gap = 14
+
+test('calculates viewport crossing speed from elapsed time', () => {
+  assert.equal(viewportSpeed(1600, 900), 320)
+  assert.equal(viewportSpeed(390, 844), 168.8)
+})
 
 test('keeps different-sized squares separated by the configured gap', () => {
   const small: SquareGeometry = { x: 100, y: 100, size: 6 }

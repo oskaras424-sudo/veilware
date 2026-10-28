@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { isSafeSquarePosition } from './floating-square-geometry'
+import { isSafeSquarePosition, viewportSpeed } from './floating-square-geometry'
 
 type Particle = {
   x: number
@@ -20,8 +20,6 @@ const SETTINGS = {
   gap: 14,
   minSize: 6,
   maxSize: 30,
-  minSpeed: 7,
-  maxSpeed: 24,
   directionChangeMin: 2.5,
   directionChangeMax: 7,
   collisionSteering: 0.16,
@@ -48,6 +46,11 @@ function overlaps(a: Particle, x: number, y: number, particles: Particle[]) {
   return !isSafeSquarePosition(a, x, y, particles, SETTINGS.gap)
 }
 
+function velocityFor(width: number, height: number, angle: number, speed: number) {
+  const scale = Math.max(width, height)
+  return { vx: Math.cos(angle) * speed * width / scale, vy: Math.sin(angle) * speed * height / scale }
+}
+
 function createParticles(width: number, height: number) {
   const particles: Particle[] = []
   const count = particleCount(width, height)
@@ -63,15 +66,16 @@ function createParticles(width: number, height: number) {
         vy: 0,
         targetAngle: Math.random() * Math.PI * 2,
         turnRate: 0.45 + Math.random() * 0.7,
-        speed: SETTINGS.minSpeed + Math.random() * (SETTINGS.maxSpeed - SETTINGS.minSpeed),
+        speed: viewportSpeed(width, height) * (0.8 + Math.random() * 0.4),
         alpha: 0.28 + Math.random() * 0.2,
         fill: Math.random() < 0.16,
       }
       if (!overlaps(candidate, candidate.x, candidate.y, particles)) placed = candidate
     }
     if (!placed) continue
-    placed.vx = Math.cos(placed.targetAngle) * placed.speed
-    placed.vy = Math.sin(placed.targetAngle) * placed.speed
+    const initialVelocity = velocityFor(width, height, placed.targetAngle, placed.speed)
+    placed.vx = initialVelocity.vx
+    placed.vy = initialVelocity.vy
     particles.push(placed)
   }
   return particles
@@ -115,10 +119,11 @@ export function FloatingSquareField() {
     const chooseSafeVelocity = (particle: Particle, nextX: number, nextY: number, step: number) => {
       const candidates = [0, 0.35, -0.35, 0.7, -0.7, 1.05, -1.05, Math.PI]
       for (const offset of candidates) {
-        const angle = Math.atan2(particle.vy, particle.vx) + offset
-        const speed = Math.max(SETTINGS.minSpeed * 0.45, particle.speed * (offset === 0 ? 1 : 0.76))
-        const candidate = keepInside(particle, particle.x + Math.cos(angle) * speed * step, particle.y + Math.sin(angle) * speed * step)
-        if (safePosition(particle, candidate.x, candidate.y)) return { vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, x: candidate.x, y: candidate.y }
+        const angle = Math.atan2(particle.vy / Math.max(height, 1), particle.vx / Math.max(width, 1)) + offset
+        const speed = particle.speed * (offset === 0 ? 1 : 0.76)
+        const { vx: velocityX, vy: velocityY } = velocityFor(width, height, angle, speed)
+        const candidate = keepInside(particle, particle.x + velocityX * step, particle.y + velocityY * step)
+        if (safePosition(particle, candidate.x, candidate.y)) return { vx: velocityX, vy: velocityY, x: candidate.x, y: candidate.y }
       }
       return null
     }
@@ -135,14 +140,17 @@ export function FloatingSquareField() {
         }
         const steer = Math.sign(difference) * Math.min(Math.abs(difference), particle.turnRate * step)
         const nextAngle = angle + steer
-        particle.vx = Math.cos(nextAngle) * particle.speed
-        particle.vy = Math.sin(nextAngle) * particle.speed
+        const steeredVelocity = velocityFor(width, height, nextAngle, particle.speed)
+        particle.vx = steeredVelocity.vx
+        particle.vy = steeredVelocity.vy
 
         const edge = particle.size / 2 + SETTINGS.gap + 18
-        if (particle.x < edge && particle.vx < 0) particle.vx += SETTINGS.collisionSteering * particle.speed
-        if (particle.x > width - edge && particle.vx > 0) particle.vx -= SETTINGS.collisionSteering * particle.speed
-        if (particle.y < edge && particle.vy < 0) particle.vy += SETTINGS.collisionSteering * particle.speed
-        if (particle.y > height - edge && particle.vy > 0) particle.vy -= SETTINGS.collisionSteering * particle.speed
+        const horizontalSpeed = particle.speed * width / Math.max(width, height)
+        const verticalSpeed = particle.speed * height / Math.max(width, height)
+        if (particle.x < edge && particle.vx < 0) particle.vx += SETTINGS.collisionSteering * horizontalSpeed
+        if (particle.x > width - edge && particle.vx > 0) particle.vx -= SETTINGS.collisionSteering * horizontalSpeed
+        if (particle.y < edge && particle.vy < 0) particle.vy += SETTINGS.collisionSteering * verticalSpeed
+        if (particle.y > height - edge && particle.vy > 0) particle.vy -= SETTINGS.collisionSteering * verticalSpeed
 
         const proposed = keepInside(particle, particle.x + particle.vx * step, particle.y + particle.vy * step)
         const safe = chooseSafeVelocity(particle, proposed.x, proposed.y, step)
@@ -152,7 +160,7 @@ export function FloatingSquareField() {
           particle.x = safe.x
           particle.y = safe.y
         } else {
-          particle.speed *= 0.985
+          particle.targetAngle += (Math.random() < 0.5 ? -1 : 1) * (Math.PI / 2 + Math.random() * 0.45)
         }
       }
     }

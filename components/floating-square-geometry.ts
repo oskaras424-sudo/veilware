@@ -1,3 +1,7 @@
+export function viewportSpeed(width: number, height: number, crossingSeconds = 5) {
+  return Math.max(width, height) / crossingSeconds
+}
+
 export type SquareGeometry = {
   x: number
   y: number
