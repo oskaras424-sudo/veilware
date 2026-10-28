@@ -47,9 +47,11 @@ export default function VeilwareSite() {
   const [activeFaq, setActiveFaq] = useState<number | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const [cursor, setCursor] = useState({ x: -100, y: -100 })
-  const [cursorReady, setCursorReady] = useState(false)
+ const [cursorReady, setCursorReady] = useState(false)
+ const [mounted, setMounted] = useState(false)
 
-  useEffect(() => {
+ useEffect(() => {
+  setMounted(true)
     const move = (event: MouseEvent) => {
       setCursor({ x: event.clientX, y: event.clientY })
       setCursorReady(true)
@@ -63,7 +65,7 @@ export default function VeilwareSite() {
   const go = (id: string) => { setMenuOpen(false); document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }) }
 
   return <main className="veilware-site">
-    {typeof document !== 'undefined' && createPortal(<div className={`cursor ${cursorReady ? 'ready' : ''}`} style={{ transform: `translate(${cursor.x}px, ${cursor.y}px)` }} aria-hidden="true"><i /></div>, document.body)}
+    {mounted && createPortal(<div className={`cursor ${cursorReady ? 'ready' : ''}`} style={{ transform: `translate(${cursor.x}px, ${cursor.y}px)` }} aria-hidden="true"><i /></div>, document.body)}
     <header className="site-header"><div className="nav-wrap"><Logo /><nav className={menuOpen ? 'open' : ''} aria-label="Main navigation">{[['home','Home'],['features','Features'],['products','Products'],['updates','Updates'],['faq','FAQ'],['support','Support']].map(([id, label]) => <button key={id} onClick={() => go(id)}>{label}</button>)}</nav><a className="discord small" href={DISCORD_INVITE} target="_blank" rel="noreferrer"> <img src={DISCORD_LOGO} alt="" /> <span>Join Discord</span></a><button className="menu-button" onClick={() => setMenuOpen(v => !v)} aria-label="Toggle menu"><Menu size={21} /></button></div></header>
 
     <section id="home" className="hero"><div className="hero-effects" aria-hidden="true"><div className="orb orb-a" /><div className="orb orb-b" /></div><div className="grid-lines" aria-hidden="true" /><div className="hero-content"><img className="hero-logo" src={VEILWARE_LOGO} alt="Veilware logo" /><h1><span>VEIL</span><b>WARE</b></h1><p className="hero-tagline">Best <em>undetected</em> softwares.</p><p className="hero-copy">Welcome to the Veilware community. We build premium,<br className="desktop" /> undetected software with a relentless focus on quality, privacy, and performance.</p><div className="hero-actions"><a className="discord" href={DISCORD_INVITE} target="_blank" rel="noreferrer"><img src={DISCORD_LOGO} alt="" /> Join Our Discord</a><button className="outline-button" onClick={() => go('features')}>Explore <ArrowDown size={16} /></button></div><div className="trust"><ShieldCheck size={14} /> PRIVACY-FIRST <span>•</span> COMMUNITY-DRIVEN</div></div><button className="scroll-cue" onClick={() => go('features')} aria-label="Scroll to features"><span /></button></section>
