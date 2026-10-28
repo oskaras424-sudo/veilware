@@ -1,6 +1,7 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
+import { FloatingSquareField } from '@/components/floating-square-field'
 
 export const metadata: Metadata = {
   title: 'VEILWARE — Best Undetected Softwares',
@@ -33,6 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
+        <FloatingSquareField />
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

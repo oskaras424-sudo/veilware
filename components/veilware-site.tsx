@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ArrowDown, ArrowRight, Bell, Box, ChevronDown, Code2, Cpu, EyeOff, Headphones, LockKeyhole, Menu, RefreshCw, ShieldCheck, Sparkles, Zap } from 'lucide-react'
 
 const crimson = '#ff334a'
@@ -47,9 +47,6 @@ export default function VeilwareSite() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [cursor, setCursor] = useState({ x: -100, y: -100 })
   const [cursorReady, setCursorReady] = useState(false)
-  const squares = useMemo(() => Array.from({ length: 44 }, (_, i) => ({
-    left: `${(i * 47 + 9) % 101}%`, top: `${(i * 71 + 3) % 98}%`, size: 7 + ((i * 13) % 18), delay: `${-(i * 0.73)}s`, duration: `${8 + (i % 11) * 1.25}s`, drift: `${(i % 2 ? 1 : -1) * (8 + i % 18)}px`, rotate: `${(i % 2 ? 1 : -1) * (20 + i * 7)}deg`, opacity: 0.16 + (i % 4) * 0.06,
-  })), [])
 
   useEffect(() => {
     const move = (event: MouseEvent) => {
@@ -68,7 +65,7 @@ export default function VeilwareSite() {
     <div className={`cursor ${cursorReady ? 'ready' : ''}`} style={{ transform: `translate(${cursor.x}px, ${cursor.y}px)` }} aria-hidden="true"><i /></div>
     <header className="site-header"><div className="nav-wrap"><Logo /><nav className={menuOpen ? 'open' : ''} aria-label="Main navigation">{[['home','Home'],['features','Features'],['products','Products'],['updates','Updates'],['faq','FAQ'],['support','Support']].map(([id, label]) => <button key={id} onClick={() => go(id)}>{label}</button>)}</nav><a className="discord small" href={DISCORD_INVITE} target="_blank" rel="noreferrer"> <img src={DISCORD_LOGO} alt="" /> <span>Join Discord</span></a><button className="menu-button" onClick={() => setMenuOpen(v => !v)} aria-label="Toggle menu"><Menu size={21} /></button></div></header>
 
-    <section id="home" className="hero"><div className="hero-effects" aria-hidden="true"><div className="orb orb-a" /><div className="orb orb-b" />{squares.map((square, i) => <span key={i} className="floating-square" style={{ left: square.left, top: square.top, width: square.size, height: square.size, animationDelay: square.delay, animationDuration: square.duration, ['--drift' as string]: square.drift, ['--rotate' as string]: square.rotate, opacity: square.opacity }} />)}</div><div className="grid-lines" aria-hidden="true" /><div className="hero-content"><img className="hero-logo" src={VEILWARE_LOGO} alt="Veilware logo" /><h1><span>VEIL</span><b>WARE</b></h1><p className="hero-tagline">Best <em>undetected</em> softwares.</p><p className="hero-copy">Welcome to the Veilware community. We build premium,<br className="desktop" /> undetected software with a relentless focus on quality, privacy, and performance.</p><div className="hero-actions"><a className="discord" href={DISCORD_INVITE} target="_blank" rel="noreferrer"><img src={DISCORD_LOGO} alt="" /> Join Our Discord</a><button className="outline-button" onClick={() => go('features')}>Explore <ArrowDown size={16} /></button></div><div className="trust"><ShieldCheck size={14} /> PRIVACY-FIRST <span>•</span> COMMUNITY-DRIVEN</div></div><button className="scroll-cue" onClick={() => go('features')} aria-label="Scroll to features"><span /></button></section>
+    <section id="home" className="hero"><div className="hero-effects" aria-hidden="true"><div className="orb orb-a" /><div className="orb orb-b" /></div><div className="grid-lines" aria-hidden="true" /><div className="hero-content"><img className="hero-logo" src={VEILWARE_LOGO} alt="Veilware logo" /><h1><span>VEIL</span><b>WARE</b></h1><p className="hero-tagline">Best <em>undetected</em> softwares.</p><p className="hero-copy">Welcome to the Veilware community. We build premium,<br className="desktop" /> undetected software with a relentless focus on quality, privacy, and performance.</p><div className="hero-actions"><a className="discord" href={DISCORD_INVITE} target="_blank" rel="noreferrer"><img src={DISCORD_LOGO} alt="" /> Join Our Discord</a><button className="outline-button" onClick={() => go('features')}>Explore <ArrowDown size={16} /></button></div><div className="trust"><ShieldCheck size={14} /> PRIVACY-FIRST <span>•</span> COMMUNITY-DRIVEN</div></div><button className="scroll-cue" onClick={() => go('features')} aria-label="Scroll to features"><span /></button></section>
 
     <section id="features" className="section feature-section"><ScrollReveal className="section-heading"><div className="eyebrow">● &nbsp; FEATURES</div><h2>Engineered to stay <em>invisible</em></h2><p>Every Veilware product is built around the same promise — reliable,<br className="desktop" /> undetected, and crafted with care.</p></ScrollReveal><div className="feature-grid">{features.map(({ icon: Icon, title, copy }, i) => <ScrollReveal className="feature-card" key={title}><div className="icon-box"><Icon size={21} /></div><h3>{title}</h3><p>{copy}</p></ScrollReveal>)}</div></section>
 
