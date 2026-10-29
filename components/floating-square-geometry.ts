@@ -1,4 +1,4 @@
-export function viewportSpeed(width: number, height: number, crossingSeconds = 5) {
+export function viewportSpeed(width: number, height: number, crossingSeconds = 9) {
   return Math.max(width, height) / crossingSeconds
 }
 

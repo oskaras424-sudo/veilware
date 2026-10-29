@@ -5,8 +5,8 @@ import { isSafeSquarePosition, squaresOverlap, viewportSpeed, type SquareGeometr
 const gap = 14
 
 test('calculates viewport crossing speed from elapsed time', () => {
-  assert.equal(viewportSpeed(1600, 900), 320)
-  assert.equal(viewportSpeed(390, 844), 168.8)
+  assert.equal(viewportSpeed(1600, 900), 177.77777777777777)
+  assert.equal(viewportSpeed(390, 844), 93.77777777777777)
 })
 
 test('keeps different-sized squares separated by the configured gap', () => {

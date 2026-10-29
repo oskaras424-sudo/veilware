@@ -114,18 +114,45 @@ export function FloatingSquareField() {
       y: Math.max(particle.size / 2 + SETTINGS.gap, Math.min(height - particle.size / 2 - SETTINGS.gap, y)),
     })
 
-    const safePosition = (particle: Particle, x: number, y: number) => !overlaps(particle, x, y, particles)
+    const resolveCollisions = () => {
+      for (let first = 0; first < particles.length; first++) {
+        const a = particles[first]
+        for (let second = first + 1; second < particles.length; second++) {
+          const b = particles[second]
+          const overlapX = (a.size + b.size) / 2 + SETTINGS.gap - Math.abs(a.x - b.x)
+          const overlapY = (a.size + b.size) / 2 + SETTINGS.gap - Math.abs(a.y - b.y)
+          if (overlapX <= 0 || overlapY <= 0) continue
 
-    const chooseSafeVelocity = (particle: Particle, nextX: number, nextY: number, step: number) => {
-      const candidates = [0, 0.35, -0.35, 0.7, -0.7, 1.05, -1.05, Math.PI]
-      for (const offset of candidates) {
-        const angle = Math.atan2(particle.vy / Math.max(height, 1), particle.vx / Math.max(width, 1)) + offset
-        const speed = particle.speed * (offset === 0 ? 1 : 0.76)
-        const { vx: velocityX, vy: velocityY } = velocityFor(width, height, angle, speed)
-        const candidate = keepInside(particle, particle.x + velocityX * step, particle.y + velocityY * step)
-        if (safePosition(particle, candidate.x, candidate.y)) return { vx: velocityX, vy: velocityY, x: candidate.x, y: candidate.y }
+          const horizontal = overlapX < overlapY
+          const direction = horizontal ? Math.sign(a.x - b.x) || 1 : Math.sign(a.y - b.y) || 1
+          const separation = horizontal ? overlapX : overlapY
+          if (horizontal) {
+            a.x += direction * separation / 2
+            b.x -= direction * separation / 2
+            const relative = a.vx - b.vx
+            if (relative * direction < 0) {
+              const exchanged = a.vx
+              a.vx = b.vx
+              b.vx = exchanged
+            }
+          } else {
+            a.y += direction * separation / 2
+            b.y -= direction * separation / 2
+            const relative = a.vy - b.vy
+            if (relative * direction < 0) {
+              const exchanged = a.vy
+              a.vy = b.vy
+              b.vy = exchanged
+            }
+          }
+          const aInside = keepInside(a, a.x, a.y)
+          const bInside = keepInside(b, b.x, b.y)
+          a.x = aInside.x
+          a.y = aInside.y
+          b.x = bInside.x
+          b.y = bInside.y
+        }
       }
-      return null
     }
 
     const simulate = (step: number) => {
@@ -152,17 +179,13 @@ export function FloatingSquareField() {
         if (particle.y < edge && particle.vy < 0) particle.vy += SETTINGS.collisionSteering * verticalSpeed
         if (particle.y > height - edge && particle.vy > 0) particle.vy -= SETTINGS.collisionSteering * verticalSpeed
 
-        const proposed = keepInside(particle, particle.x + particle.vx * step, particle.y + particle.vy * step)
-        const safe = chooseSafeVelocity(particle, proposed.x, proposed.y, step)
-        if (safe) {
-          particle.vx = safe.vx
-          particle.vy = safe.vy
-          particle.x = safe.x
-          particle.y = safe.y
-        } else {
-          particle.targetAngle += (Math.random() < 0.5 ? -1 : 1) * (Math.PI / 2 + Math.random() * 0.45)
-        }
+        const next = keepInside(particle, particle.x + particle.vx * step, particle.y + particle.vy * step)
+        if (next.x === particle.x) particle.vx = Math.abs(particle.vx) * (particle.x < width / 2 ? 1 : -1)
+        if (next.y === particle.y) particle.vy = Math.abs(particle.vy) * (particle.y < height / 2 ? 1 : -1)
+        particle.x = next.x
+        particle.y = next.y
       }
+      resolveCollisions()
     }
 
     const draw = () => {
