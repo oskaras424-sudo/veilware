@@ -57,6 +57,7 @@ function Logo() {
 export default function VeilwareSite() {
   const [activeFaq, setActiveFaq] = useState<number | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [activeSection, setActiveSection] = useState('home')
  useEffect(() => {
   const cursorElement = document.createElement('div')
   cursorElement.className = 'cursor'
@@ -89,6 +90,27 @@ export default function VeilwareSite() {
   }
  }, [])
 
+  useEffect(() => {
+    const sections = Array.from(document.querySelectorAll<HTMLElement>('.veilware-site [data-nav-section]'))
+    const observer = new IntersectionObserver((entries) => {
+      const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
+      if (visible) setActiveSection((visible.target as HTMLElement).id)
+    }, { rootMargin: '-72px 0px -45% 0px', threshold: [0.12, 0.35, 0.65] })
+    sections.forEach((section) => observer.observe(section))
+    const syncHash = () => {
+      const id = window.location.hash.slice(1)
+      if (id && sections.some((section) => section.id === id)) setActiveSection(id)
+    }
+    syncHash()
+    window.addEventListener('popstate', syncHash)
+    window.addEventListener('hashchange', syncHash)
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('popstate', syncHash)
+      window.removeEventListener('hashchange', syncHash)
+    }
+  }, [])
+
   const go = (id: string, trigger?: HTMLElement) => {
     if (trigger) {
       trigger.classList.remove('is-pulsing')
@@ -96,23 +118,33 @@ export default function VeilwareSite() {
       trigger.classList.add('is-pulsing')
     }
     setMenuOpen(false)
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+    setActiveSection(id)
+    const section = document.getElementById(id)
+    if (!section) return
+    const headerHeight = document.querySelector<HTMLElement>('.site-header')?.offsetHeight ?? 72
+    const top = Math.max(0, section.getBoundingClientRect().top + window.scrollY - headerHeight - 18)
+    section.classList.remove('section-entering')
+    void section.offsetWidth
+    section.classList.add('section-entering')
+    window.setTimeout(() => section.classList.remove('section-entering'), 700)
+    window.history.pushState({}, '', `#${id}`)
+    window.scrollTo({ top, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })
   }
 
   return <main className="veilware-site">
-    <header className="site-header"><div className="nav-wrap"><Logo /><nav className={menuOpen ? 'open' : ''} aria-label="Main navigation">{[['home','Home'],['features','Features'],['products','Products'],['updates','Updates'],['faq','FAQ'],['support','Support']].map(([id, label]) => <button key={id} onClick={() => go(id)}>{label}</button>)}</nav><a className="discord small" href={DISCORD_INVITE} target="_blank" rel="noreferrer"> <img src={DISCORD_LOGO} alt="" /> <span>Join Discord</span></a><button className="menu-button" onClick={() => setMenuOpen(v => !v)} aria-label="Toggle menu"><Menu size={21} /></button></div></header>
+    <header className="site-header"><div className="nav-wrap"><Logo /><nav className={menuOpen ? 'open' : ''} aria-label="Main navigation">{[['home','Home'],['features','Features'],['products','Products'],['updates','Updates'],['faq','FAQ'],['support','Support']].map(([id, label]) => <button key={id} className={activeSection === id ? 'active' : ''} aria-current={activeSection === id ? 'location' : undefined} onClick={(event) => go(id, event.currentTarget)}>{label}</button>)}</nav><a className="discord small" href={DISCORD_INVITE} target="_blank" rel="noreferrer"> <img src={DISCORD_LOGO} alt="" /> <span>Join Discord</span></a><button className="menu-button" onClick={() => setMenuOpen(v => !v)} aria-label="Toggle menu"><Menu size={21} /></button></div></header>
 
-    <section id="home" className="hero"><div className="hero-effects" aria-hidden="true"><div className="orb orb-a" /><div className="orb orb-b" /></div><div className="hero-content"><img className="hero-logo hero-logo-refined" src={VEILWARE_LOGO} alt="Veilware logo" /><h1><span>VEIL</span><b className="hero-wordmark-accent">WARE</b></h1><p className="hero-tagline">Best <em>undetected</em> softwares.</p><p className="hero-copy">Welcome to the Veilware community. We build premium,<br className="desktop" /> undetected software with a relentless focus on quality, privacy, and performance.</p><div className="hero-actions"><a className="discord" href={DISCORD_INVITE} target="_blank" rel="noreferrer"><img src={DISCORD_LOGO} alt="" /> Join Our Discord</a><button className="outline-button" onClick={(event) => go('features', event.currentTarget)}>Explore <ArrowDown size={16} /></button></div><div className="trust"><ShieldCheck size={14} /> PRIVACY-FIRST <span>•</span> COMMUNITY-DRIVEN</div></div><button className="scroll-cue" onClick={() => go('features')} aria-label="Scroll to features"><span className="scroll-cue-dot" /></button></section>
+    <section id="home" data-nav-section className={`hero ${activeSection === 'home' ? 'is-active' : ''}`}><div className="hero-effects" aria-hidden="true"><div className="orb orb-a" /><div className="orb orb-b" /></div><div className="hero-content"><img className="hero-logo hero-logo-refined" src={VEILWARE_LOGO} alt="Veilware logo" /><h1><span>VEIL</span><b className="hero-wordmark-accent">WARE</b></h1><p className="hero-tagline">Best <em>undetected</em> softwares.</p><p className="hero-copy">Welcome to the Veilware community. We build premium,<br className="desktop" /> undetected software with a relentless focus on quality, privacy, and performance.</p><div className="hero-actions"><a className="discord" href={DISCORD_INVITE} target="_blank" rel="noreferrer"><img src={DISCORD_LOGO} alt="" /> Join Our Discord</a><button className="outline-button" onClick={(event) => go('features', event.currentTarget)}>Explore <ArrowDown size={16} /></button></div><div className="trust"><ShieldCheck size={14} /> PRIVACY-FIRST <span>•</span> COMMUNITY-DRIVEN</div></div><button className="scroll-cue" onClick={() => go('features')} aria-label="Scroll to features"><span className="scroll-cue-dot" /></button></section>
 
-    <section id="features" className="section feature-section"><ScrollReveal className="section-heading"><div className="eyebrow">● &nbsp; FEATURES</div><h2>Engineered to stay <em>invisible</em></h2><p>Every Veilware product is built around the same promise — reliable,<br className="desktop" /> undetected, and crafted with care.</p></ScrollReveal><div className="feature-grid">{features.map(({ icon: Icon, title, copy }, i) => <ScrollReveal magnetic maxMovement={16} className="feature-card" key={title}><div className="icon-box"><Icon size={21} /></div><h3>{title}</h3><p>{copy}</p></ScrollReveal>)}</div></section>
+    <section id="features" data-nav-section className="section feature-section"><ScrollReveal className="section-heading"><div className="eyebrow">● &nbsp; FEATURES</div><h2>Engineered to stay <em>invisible</em></h2><p>Every Veilware product is built around the same promise — reliable,<br className="desktop" /> undetected, and crafted with care.</p></ScrollReveal><div className="feature-grid">{features.map(({ icon: Icon, title, copy }, i) => <ScrollReveal magnetic maxMovement={16} className="feature-card" key={title}><div className="icon-box"><Icon size={21} /></div><h3>{title}</h3><p>{copy}</p></ScrollReveal>)}</div></section>
 
-    <section id="products" className="section products-section"><div className="product-bg" aria-hidden="true" /><ScrollReveal className="section-heading"><div className="eyebrow">● &nbsp; THE VEILWARE COLLECTION</div><h2><span>OUR</span> <em>PRODUCTS</em></h2><p>A focused collection of tools designed with the same attention to privacy,<br className="desktop" /> precision, and performance that defines Veilware.</p><div className="coming">● &nbsp; COMING SOON</div></ScrollReveal><div className="product-grid">{products.map(({ icon: Icon, title, copy }) => <ScrollReveal magnetic maxMovement={14} className="product-card" key={title}><div className="card-top"><div className="icon-box"><Icon size={20} /></div><span>SOON</span></div><h3>{title}</h3><p>{copy}</p></ScrollReveal>)}</div></section>
+    <section id="products" data-nav-section className="section products-section"><div className="product-bg" aria-hidden="true" /><ScrollReveal className="section-heading"><div className="eyebrow">● &nbsp; THE VEILWARE COLLECTION</div><h2><span>OUR</span> <em>PRODUCTS</em></h2><p>A focused collection of tools designed with the same attention to privacy,<br className="desktop" /> precision, and performance that defines Veilware.</p><div className="coming">● &nbsp; COMING SOON</div></ScrollReveal><div className="product-grid">{products.map(({ icon: Icon, title, copy }) => <ScrollReveal magnetic maxMovement={14} className="product-card" key={title}><div className="card-top"><div className="icon-box"><Icon size={20} /></div><span>SOON</span></div><h3>{title}</h3><p>{copy}</p></ScrollReveal>)}</div></section>
 
-    <section id="updates" className="section updates-section"><ScrollReveal className="section-heading"><div className="eyebrow">● &nbsp; UPDATES</div><h2>No <em>updates</em> yet</h2><p>There is nothing new to share right now. Announcements will appear here<br className="desktop" /> when they are ready.</p></ScrollReveal><ScrollReveal magnetic maxMovement={12} className="empty-card"><div className="icon-box"><Bell size={22} /></div><p>Keep an eye on the Veilware Discord for the first product and community announcements.</p></ScrollReveal></section>
+    <section id="updates" data-nav-section className="section updates-section"><ScrollReveal className="section-heading"><div className="eyebrow">● &nbsp; UPDATES</div><h2>No <em>updates</em> yet</h2><p>There is nothing new to share right now. Announcements will appear here<br className="desktop" /> when they are ready.</p></ScrollReveal><ScrollReveal magnetic maxMovement={12} className="empty-card"><div className="icon-box"><Bell size={22} /></div><p>Keep an eye on the Veilware Discord for the first product and community announcements.</p></ScrollReveal></section>
 
-    <section id="faq" className="section faq-section"><ScrollReveal className="section-heading"><div className="eyebrow">● &nbsp; FAQ</div><h2>Questions, <em>answered</em></h2><p>Everything you need to know before joining the Veilware community.</p></ScrollReveal><div className="faq-list">{faqs.map(([question, answer], i) => <MagneticPanel maxMovement={12} className={`faq-item ${activeFaq === i ? 'active' : ''}`} key={question}><button type="button" onClick={() => setActiveFaq(current => current === i ? null : i)} aria-expanded={activeFaq === i} aria-controls={`faq-answer-${i}`}><span>{question}</span><span className="plus" aria-hidden="true">+</span></button><div id={`faq-answer-${i}`} className="faq-answer"><p>{answer}</p></div></MagneticPanel>)}</div></section>
+    <section id="faq" data-nav-section className="section faq-section"><ScrollReveal className="section-heading"><div className="eyebrow">● &nbsp; FAQ</div><h2>Questions, <em>answered</em></h2><p>Everything you need to know before joining the Veilware community.</p></ScrollReveal><div className="faq-list">{faqs.map(([question, answer], i) => <MagneticPanel maxMovement={12} className={`faq-item ${activeFaq === i ? 'active' : ''}`} key={question}><button type="button" onClick={() => setActiveFaq(current => current === i ? null : i)} aria-expanded={activeFaq === i} aria-controls={`faq-answer-${i}`}><span>{question}</span><span className="plus" aria-hidden="true">+</span></button><div id={`faq-answer-${i}`} className="faq-answer"><p>{answer}</p></div></MagneticPanel>)}</div></section>
 
-    <section id="support" className="support-section"><ScrollReveal magnetic maxMovement={12} className="support-card"><div className="support-icon">◉</div><div className="eyebrow">● &nbsp; COMMUNITY</div><h2>Join <em>the</em> Veilware Discord</h2><p>Talk directly with the team, get fast support, and be the first to hear<br className="desktop" /> about new releases. Our community is where everything happens.</p><a className="discord" href={DISCORD_INVITE} target="_blank" rel="noreferrer"><img src={DISCORD_LOGO} alt="" /> Join Our Discord <ArrowRight size={16} /></a></ScrollReveal></section>
+    <section id="support" data-nav-section className="support-section"><ScrollReveal magnetic maxMovement={12} className="support-card"><div className="support-icon">◉</div><div className="eyebrow">● &nbsp; COMMUNITY</div><h2>Join <em>the</em> Veilware Discord</h2><p>Talk directly with the team, get fast support, and be the first to hear<br className="desktop" /> about new releases. Our community is where everything happens.</p><a className="discord" href={DISCORD_INVITE} target="_blank" rel="noreferrer"><img src={DISCORD_LOGO} alt="" /> Join Our Discord <ArrowRight size={16} /></a></ScrollReveal></section>
 
     <footer><div className="footer-wrap"><div><Logo /><p>VEILWARE builds premium, undetected software with a focus on privacy, performance, and a community that has your back.</p><a className="social" aria-label="Discord" href={DISCORD_INVITE} target="_blank" rel="noreferrer"><img src={DISCORD_LOGO} alt="" /></a></div><div className="footer-links"><div><small>NAVIGATION</small>{['home','features','products','updates','faq','support'].map(id => <button key={id} onClick={() => go(id)}>{id[0].toUpperCase() + id.slice(1)}</button>)}</div><div><small>RESOURCES</small><a href={DISCORD_INVITE} target="_blank" rel="noreferrer">Discord Community</a><a href={DISCORD_INVITE} target="_blank" rel="noreferrer">Support Channel</a><button onClick={() => go('updates')}>Changelog</button><button onClick={() => go('faq')}>FAQ</button></div></div></div><div className="copyright">© 2026 VEILWARE. Built with intent.</div></footer>
   </main>
