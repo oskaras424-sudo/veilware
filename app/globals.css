@@ -11,6 +11,14 @@ button,a { font:inherit; }
 button { cursor:pointer; }
 .ambient-square-canvas { position:fixed; inset:0; z-index:0; width:100vw; height:100vh; pointer-events:none; opacity:.78; }
 .veilware-site { position:relative; z-index:1; overflow:hidden; background:transparent; }
+.veilware-site button, .veilware-site a { transition:transform .2s cubic-bezier(.2,.7,.2,1), opacity .2s ease, color .2s ease, background-color .2s ease, box-shadow .2s ease; }
+.veilware-site button:active, .veilware-site a:active { transform:translateY(1px) scale(.98); transition-duration:.15s; }
+.veilware-site button:focus-visible, .veilware-site a:focus-visible { outline:2px solid rgba(255,51,74,.7); outline-offset:3px; }
+.veilware-site nav button:hover, .veilware-site footer button:hover { transform:translateY(-1px); }
+.veilware-site .outline-button:hover { transform:translateY(-2px); }
+.veilware-site .discord.is-pulsing { animation:veilware-click-pulse .25s ease-out; }
+@keyframes veilware-click-pulse { from { box-shadow:0 0 0 0 rgba(255,51,74,.45); } to { box-shadow:0 0 0 14px rgba(255,51,74,0); } }
+@media (prefers-reduced-motion:reduce) { .veilware-site .discord.is-pulsing { animation:none; } .veilware-site button:active, .veilware-site a:active, .veilware-site nav button:hover, .veilware-site footer button:hover, .veilware-site .outline-button:hover { transform:none; } }
 .site-header { position:fixed; z-index:20; width:100%; top:0; background:linear-gradient(to bottom, rgba(7,7,8,.78), rgba(7,7,8,.34) 70%, transparent); backdrop-filter:blur(12px); border-bottom:0; }
 .nav-wrap { width:min(1180px,calc(100% - 48px)); height:72px; margin:auto; display:flex; align-items:center; justify-content:space-between; gap:66px; }
 .brand { color:var(--white); display:flex; align-items:center; gap:10px; text-decoration:none; font-weight:800; font-size:20px; letter-spacing:2px; }.brand img { width:30px; height:30px; object-fit:contain; border-radius:7px; mix-blend-mode:screen; }.discord img { width:17px; height:17px; object-fit:contain; mix-blend-mode:screen; }
