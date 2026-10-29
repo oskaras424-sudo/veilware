@@ -11,6 +11,11 @@ export function useMagneticPanel<T extends HTMLElement>(enabled = true, maxMovem
     const element = ref.current
     if (!element || !enabled || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
+    const glowElement = document.createElement('span')
+    glowElement.className = 'card-glow'
+    glowElement.setAttribute('aria-hidden', 'true')
+    element.prepend(glowElement)
+
     let frame = 0
     let targetX = 0
     let targetY = 0
@@ -43,6 +48,12 @@ export function useMagneticPanel<T extends HTMLElement>(enabled = true, maxMovem
     const move = (event: PointerEvent) => {
       if (event.pointerType && event.pointerType !== 'mouse') return
       const bounds = element.getBoundingClientRect()
+      const glowX = ((event.clientX - bounds.left) / bounds.width) * 100
+      const glowY = ((event.clientY - bounds.top) / bounds.height) * 100
+      element.style.setProperty('--glow-x', `${Math.max(0, Math.min(100, glowX))}%`)
+      element.style.setProperty('--glow-y', `${Math.max(0, Math.min(100, glowY))}%`)
+      element.classList.add('is-glowing')
+      glowElement.style.opacity = '1'
       targetX = Math.max(-1, Math.min(1, (event.clientX - bounds.left - bounds.width / 2) / (bounds.width / 2))) * maxMovement
       targetY = Math.max(-1, Math.min(1, (event.clientY - bounds.top - bounds.height / 2) / (bounds.height / 2))) * maxMovement
       active = true
@@ -53,6 +64,8 @@ export function useMagneticPanel<T extends HTMLElement>(enabled = true, maxMovem
       targetX = 0
       targetY = 0
       active = false
+      element.classList.remove('is-glowing')
+      glowElement.style.opacity = '0'
       schedule()
     }
 
@@ -67,6 +80,10 @@ export function useMagneticPanel<T extends HTMLElement>(enabled = true, maxMovem
       element.removeEventListener('pointerleave', leave)
       element.style.removeProperty('--magnetic-x')
       element.style.removeProperty('--magnetic-y')
+      element.style.removeProperty('--glow-x')
+      element.style.removeProperty('--glow-y')
+      element.classList.remove('is-glowing')
+      glowElement.remove()
     }
   }, [enabled, maxMovement])
 

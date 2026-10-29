@@ -223,6 +223,38 @@ footer { border-top:1px solid #242428; padding:60px max(24px,calc((100% - 1180px
   pointer-events:none;
 }
 .support-card .support-icon { color:#ff7180; text-shadow:0 0 14px rgba(255,65,82,.24); }
+
+.magnetic-panel {
+  position:relative;
+  --glow-x:50%;
+  --glow-y:50%;
+}
+.magnetic-panel > :not(.card-glow) {
+  position:relative;
+  z-index:1;
+}
+.card-glow {
+  position:absolute;
+  inset:0;
+  z-index:0;
+  border-radius:inherit;
+  pointer-events:none;
+  opacity:0;
+  background:radial-gradient(220px circle at var(--glow-x) var(--glow-y), rgba(139,0,0,.22), rgba(139,0,0,.08) 32%, transparent 70%);
+  mix-blend-mode:screen;
+  transition:opacity 220ms ease;
+}
+.feature-card.is-glowing,
+.product-card.is-glowing,
+.empty-card.is-glowing,
+.faq-item.is-glowing,
+.support-card.is-glowing {
+  border-color:rgba(194,48,65,.7);
+  box-shadow:0 18px 42px rgba(0,0,0,.3), 0 0 24px rgba(139,0,0,.16), inset 0 1px 0 rgba(255,255,255,.075), inset 0 -1px 0 rgba(0,0,0,.45);
+}
+@media (prefers-reduced-motion:reduce) {
+  .card-glow { transition:none; }
+}
 .coming {
   border:1px solid rgba(139,0,0,.25);
   border-radius:999px;
