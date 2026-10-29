@@ -22,8 +22,8 @@ export function useMagneticPanel<T extends HTMLElement>(enabled = true, maxMovem
     const animate = () => {
       currentX += (targetX - currentX) * (active ? 0.2 : 0.14)
       currentY += (targetY - currentY) * (active ? 0.2 : 0.14)
-      if (!active && Math.abs(currentX) < 0.04) currentX = 0
-      if (!active && Math.abs(currentY) < 0.04) currentY = 0
+      if (!active && Math.abs(currentX) < 0.1) currentX = 0
+      if (!active && Math.abs(currentY) < 0.1) currentY = 0
       element.style.setProperty('--magnetic-x', `${currentX.toFixed(3)}px`)
       element.style.setProperty('--magnetic-y', `${currentY.toFixed(3)}px`)
       if (!active && currentX === 0 && currentY === 0) {
