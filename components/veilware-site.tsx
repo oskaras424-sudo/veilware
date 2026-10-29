@@ -10,20 +10,20 @@ const DISCORD_LOGO = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/im
 const VEILWARE_LOGO = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/9242e430-1360-46fa-9351-1fa170562f7e-RUNH1ejiJItyIHQwpvAUWXyHg9LXtJ.png'
 
 const features = [
-  { icon: ShieldCheck, title: 'Undetected by Design', copy: 'Built with stealth-first architecture to stay ahead of detection systems.' },
+  { icon: ShieldCheck, title: 'Ud by Design', copy: 'Built with stealth-first architecture to stay ahead of detection systems.' },
   { icon: Cpu, title: 'Optimized Performance', copy: 'Lightweight code that runs smooth without dragging down your system.' },
   { icon: EyeOff, title: 'Privacy First', copy: 'Your data stays yours. No telemetry, no compromises.' },
   { icon: Zap, title: 'Fast Updates', copy: 'Rapid response to changes so you stay up and running without downtime.' },
   { icon: RefreshCw, title: 'Always Maintained', copy: 'Continuous improvements and active development from a dedicated team.' },
   { icon: Headphones, title: 'Community Support', copy: 'Real help from real people in our active Discord community, 24/7.' },
-  { icon: LockKeyhole, title: 'Secure Builds', copy: 'Signed and verified releases so you always know what you are running.' },
+  { icon: LockKeyhole, title: 'Secure Builds', copy: 'tested releases so your product always works on release.' },
   { icon: Code2, title: 'Modern Stack', copy: 'Crafted with current, well-supported technologies for long-term reliability.' },
 ]
 
 const products = [
-  { icon: Box, title: 'Roblox Executor', copy: 'High quality roblox executor' },
-  { icon: Sparkles, title: 'Fortnite External', copy: 'Our premium undetected external' },
-  { icon: Bell, title: 'Temp Spoofer', copy: 'Best temp spoofer on the market' },
+  { icon: Box, title: 'Roblox Executor', copy: 'A Roblox executor for running scripts in game with a straight forward UI for exploiting in your favorite games.' },
+  { icon: Sparkles, title: 'Fortnite External', copy: 'An external Fortnite cheat with its own interface and features being finalised ahead of release.' },
+  { icon: Bell, title: 'Temp Spoofer', copy: 'A temporary system spoofer designed to change a device identifiers for a session, without making permanent changes to your setup.' },
 ]
 
 const faqs = [
@@ -94,7 +94,7 @@ export default function VeilwareSite() {
   return <main className="veilware-site">
     <header className="site-header"><div className="nav-wrap"><Logo /><nav className={menuOpen ? 'open' : ''} aria-label="Main navigation">{[['home','Home'],['features','Features'],['products','Products'],['updates','Updates'],['faq','FAQ'],['support','Support']].map(([id, label]) => <button key={id} onClick={() => go(id)}>{label}</button>)}</nav><a className="discord small" href={DISCORD_INVITE} target="_blank" rel="noreferrer"> <img src={DISCORD_LOGO} alt="" /> <span>Join Discord</span></a><button className="menu-button" onClick={() => setMenuOpen(v => !v)} aria-label="Toggle menu"><Menu size={21} /></button></div></header>
 
-    <section id="home" className="hero"><div className="hero-effects" aria-hidden="true"><div className="orb orb-a" /><div className="orb orb-b" /></div><div className="hero-content"><img className="hero-logo" src={VEILWARE_LOGO} alt="Veilware logo" /><h1><span>VEIL</span><b>WARE</b></h1><p className="hero-tagline">Best <em>undetected</em> softwares.</p><p className="hero-copy">Welcome to the Veilware community. We build premium,<br className="desktop" /> undetected software with a relentless focus on quality, privacy, and performance.</p><div className="hero-actions"><a className="discord" href={DISCORD_INVITE} target="_blank" rel="noreferrer"><img src={DISCORD_LOGO} alt="" /> Join Our Discord</a><button className="outline-button" onClick={() => go('features')}>Explore <ArrowDown size={16} /></button></div><div className="trust"><ShieldCheck size={14} /> PRIVACY-FIRST <span>•</span> COMMUNITY-DRIVEN</div></div><button className="scroll-cue" onClick={() => go('features')} aria-label="Scroll to features"><span /></button></section>
+    <section id="home" className="hero"><div className="hero-effects" aria-hidden="true"><div className="orb orb-a" /><div className="orb orb-b" /></div><div className="hero-content"><img className="hero-logo" src={VEILWARE_LOGO} alt="Veilware logo" /><h1><span>VEIL</span><b className="hero-wordmark-accent">WARE</b></h1><p className="hero-tagline">Best <em>undetected</em> softwares.</p><p className="hero-copy">Welcome to the Veilware community. We build premium,<br className="desktop" /> undetected software with a relentless focus on quality, privacy, and performance.</p><div className="hero-actions"><a className="discord" href={DISCORD_INVITE} target="_blank" rel="noreferrer"><img src={DISCORD_LOGO} alt="" /> Join Our Discord</a><button className="outline-button" onClick={() => go('features')}>Explore <ArrowDown size={16} /></button></div><div className="trust"><ShieldCheck size={14} /> PRIVACY-FIRST <span>•</span> COMMUNITY-DRIVEN</div></div><button className="scroll-cue" onClick={() => go('features')} aria-label="Scroll to features"><span className="scroll-cue-dot" /></button></section>
 
     <section id="features" className="section feature-section"><ScrollReveal className="section-heading"><div className="eyebrow">● &nbsp; FEATURES</div><h2>Engineered to stay <em>invisible</em></h2><p>Every Veilware product is built around the same promise — reliable,<br className="desktop" /> undetected, and crafted with care.</p></ScrollReveal><div className="feature-grid">{features.map(({ icon: Icon, title, copy }, i) => <ScrollReveal magnetic maxMovement={16} className="feature-card" key={title}><div className="icon-box"><Icon size={21} /></div><h3>{title}</h3><p>{copy}</p></ScrollReveal>)}</div></section>
 

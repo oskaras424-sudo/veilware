@@ -252,5 +252,12 @@ footer { border-top:0; padding:60px max(24px,calc((100% - 1180px)/2)) 28px; }.fo
   border-radius:999px;
   background:rgba(70,8,16,.22);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+  padding-right:17px;
+  font-size:16px;
 }
+.faq-section .eyebrow { font-size:16px; }
+.support-section .support-icon { margin-bottom:0; }
+.support-card { padding-bottom:33px; margin-left:144px; margin-right:136px; }
+.hero h1 b.hero-wordmark-accent { font-style:italic; }
+.scroll-cue-dot { display:block; width:3px; height:8px; margin:6px auto 0; border-radius:999px; background:var(--bright); animation:scrollDot 1.6s ease-in-out infinite; }
 
