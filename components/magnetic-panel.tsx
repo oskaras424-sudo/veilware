@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 
-const MAX_MOVEMENT = 8
+const MAX_MOVEMENT = 16
 
 export function useMagneticPanel<T extends HTMLElement>(enabled = true, maxMovement = MAX_MOVEMENT) {
   const ref = useRef<T>(null)
