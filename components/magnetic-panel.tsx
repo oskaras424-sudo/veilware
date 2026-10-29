@@ -17,6 +17,7 @@ export function useMagneticPanel<T extends HTMLElement>(enabled = true, maxMovem
     element.prepend(glowElement)
 
     let frame = 0
+    let resetTimer = 0
     let targetX = 0
     let targetY = 0
     let currentX = 0
@@ -47,6 +48,7 @@ export function useMagneticPanel<T extends HTMLElement>(enabled = true, maxMovem
 
     const move = (event: PointerEvent) => {
       if (event.pointerType && event.pointerType !== 'mouse') return
+      window.clearTimeout(resetTimer)
       const bounds = element.getBoundingClientRect()
       const glowX = ((event.clientX - bounds.left) / bounds.width) * 100
       const glowY = ((event.clientY - bounds.top) / bounds.height) * 100
@@ -67,6 +69,15 @@ export function useMagneticPanel<T extends HTMLElement>(enabled = true, maxMovem
       element.classList.remove('is-glowing')
       glowElement.style.opacity = '0'
       schedule()
+      resetTimer = window.setTimeout(() => {
+        currentX = 0
+        currentY = 0
+        element.style.setProperty('--magnetic-x', '0px')
+        element.style.setProperty('--magnetic-y', '0px')
+        running = false
+        if (frame) cancelAnimationFrame(frame)
+        frame = 0
+      }, 450)
     }
 
     element.addEventListener('pointermove', move, { passive: true })
@@ -75,6 +86,7 @@ export function useMagneticPanel<T extends HTMLElement>(enabled = true, maxMovem
 
     return () => {
       cancelAnimationFrame(frame)
+      window.clearTimeout(resetTimer)
       element.removeEventListener('pointermove', move)
       element.removeEventListener('pointerenter', move)
       element.removeEventListener('pointerleave', leave)
