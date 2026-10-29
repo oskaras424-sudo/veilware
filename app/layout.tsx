@@ -4,8 +4,8 @@ import './globals.css'
 import { FloatingSquareField } from '@/components/floating-square-field'
 
 export const metadata: Metadata = {
-  title: 'VEILWARE — Private tools, built for play',
-  description: 'Private gaming tools, steady updates, and a community that helps you get set up.',
+  title: 'VEILWARE — Undetected tools, built for play',
+  description: 'Undetected gaming tools, steady updates, and a community that helps you get set up.',
   generator: 'v0.app',
   icons: {
     icon: [

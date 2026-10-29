@@ -10,19 +10,19 @@ const DISCORD_LOGO = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/im
 const VEILWARE_LOGO = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/9242e430-1360-46fa-9351-1fa170562f7e-RUNH1ejiJItyIHQwpvAUWXyHg9LXtJ.png'
 
 const features = [
-  { icon: ShieldCheck, title: 'Built for privacy', copy: 'The product is designed with privacy in mind, from the first build onward.' },
-  { icon: Cpu, title: 'Runs light', copy: 'The code is kept lean so it does not get in the way of the rest of your system.' },
-  { icon: EyeOff, title: 'Your data stays yours', copy: 'We do not use telemetry, and we do not trade away your privacy for convenience.' },
-  { icon: Zap, title: 'Quick updates', copy: 'When something changes, we work on a response so you are not left waiting.' },
-  { icon: RefreshCw, title: 'Actively maintained', copy: 'The team keeps working on the tools instead of leaving old builds behind.' },
-  { icon: Headphones, title: 'People you can ask', copy: 'The Discord community is the place to get help from the team and other users.' },
-  { icon: LockKeyhole, title: 'Signed releases', copy: 'Each release is signed and verified so you can check what you are running.' },
-  { icon: Code2, title: 'Current tooling', copy: 'We use supported technologies and keep the stack practical to maintain.' },
+  { icon: ShieldCheck, title: 'Undetected by Design', copy: 'The software starts with a stealth-first approach rather than adding it later.' },
+  { icon: Cpu, title: 'Optimized Performance', copy: 'The code is kept lean so it does not get in the way of the rest of your system.' },
+  { icon: EyeOff, title: 'Privacy First', copy: 'We do not use telemetry, and we do not trade away your privacy for convenience.' },
+  { icon: Zap, title: 'Fast Updates', copy: 'When something changes, we work on a response so you are not left waiting.' },
+  { icon: RefreshCw, title: 'Always Maintained', copy: 'The team keeps working on the tools instead of leaving old builds behind.' },
+  { icon: Headphones, title: 'Community Support', copy: 'The Discord community is the place to get help from the team and other users.' },
+  { icon: LockKeyhole, title: 'Secure Builds', copy: 'Each release is signed and verified so you can check what you are running.' },
+  { icon: Code2, title: 'Modern Stack', copy: 'We use supported technologies and keep the stack practical to maintain.' },
 ]
 
 const products = [
-  { icon: Box, title: 'Roblox Executor', copy: 'A Roblox executor currently in development.' },
-  { icon: Sparkles, title: 'Fortnite External', copy: 'A Fortnite external currently in development.' },
+  { icon: Box, title: 'Roblox Executor', copy: 'A high-quality Roblox executor currently in development.' },
+  { icon: Sparkles, title: 'Fortnite External', copy: 'A premium, undetected external currently in development.' },
   { icon: Bell, title: 'Temp Spoofer', copy: 'A temporary spoofer currently in development.' },
 ]
 
@@ -94,7 +94,7 @@ export default function VeilwareSite() {
   return <main className="veilware-site">
     <header className="site-header"><div className="nav-wrap"><Logo /><nav className={menuOpen ? 'open' : ''} aria-label="Main navigation">{[['home','Home'],['features','Features'],['products','Products'],['updates','Updates'],['faq','FAQ'],['support','Support']].map(([id, label]) => <button key={id} onClick={() => go(id)}>{label}</button>)}</nav><a className="discord small" href={DISCORD_INVITE} target="_blank" rel="noreferrer"> <img src={DISCORD_LOGO} alt="" /> <span>Join Discord</span></a><button className="menu-button" onClick={() => setMenuOpen(v => !v)} aria-label="Toggle menu"><Menu size={21} /></button></div></header>
 
-    <section id="home" className="hero"><div className="hero-effects" aria-hidden="true"><div className="orb orb-a" /><div className="orb orb-b" /></div><div className="grid-lines" aria-hidden="true" /><div className="hero-content"><img className="hero-logo" src={VEILWARE_LOGO} alt="Veilware logo" /><h1><span>VEIL</span><b>WARE</b></h1><p className="hero-tagline">Private tools, built for play.</p><p className="hero-copy">Veilware is a community for people who want capable tools without the noise. We care about privacy, steady updates, and software that does its job.</p><div className="hero-actions"><a className="discord" href={DISCORD_INVITE} target="_blank" rel="noreferrer"><img src={DISCORD_LOGO} alt="" /> Join Our Discord</a><button className="outline-button" onClick={() => go('features')}>Explore <ArrowDown size={16} /></button></div><div className="trust"><ShieldCheck size={14} /> PRIVACY-FIRST <span>•</span> BUILT WITH THE COMMUNITY</div></div><button className="scroll-cue" onClick={() => go('features')} aria-label="Scroll to features"><span /></button></section>
+    <section id="home" className="hero"><div className="hero-effects" aria-hidden="true"><div className="orb orb-a" /><div className="orb orb-b" /></div><div className="grid-lines" aria-hidden="true" /><div className="hero-content"><img className="hero-logo" src={VEILWARE_LOGO} alt="Veilware logo" /><h1><span>VEIL</span><b>WARE</b></h1><p className="hero-tagline">Undetected tools, built for play.</p><p className="hero-copy">Veilware is a community for people who want capable tools without the noise. We care about privacy, steady updates, and software that does its job.</p><div className="hero-actions"><a className="discord" href={DISCORD_INVITE} target="_blank" rel="noreferrer"><img src={DISCORD_LOGO} alt="" /> Join Our Discord</a><button className="outline-button" onClick={() => go('features')}>Explore <ArrowDown size={16} /></button></div><div className="trust"><ShieldCheck size={14} /> PRIVACY-FIRST <span>•</span> BUILT WITH THE COMMUNITY</div></div><button className="scroll-cue" onClick={() => go('features')} aria-label="Scroll to features"><span /></button></section>
 
     <section id="features" className="section feature-section"><ScrollReveal className="section-heading"><div className="eyebrow">● &nbsp; FEATURES</div><h2>Made to keep a low <em>profile</em></h2><p>Each tool follows the same approach: keep it private, keep it reliable,<br className="desktop" /> and keep improving it when the platform changes.</p></ScrollReveal><div className="feature-grid">{features.map(({ icon: Icon, title, copy }, i) => <ScrollReveal magnetic maxMovement={8} className="feature-card" key={title}><div className="icon-box"><Icon size={21} /></div><h3>{title}</h3><p>{copy}</p></ScrollReveal>)}</div></section>
 
