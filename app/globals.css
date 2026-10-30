@@ -280,7 +280,7 @@ footer { border-top:0; padding:60px max(24px,calc((100% - 1180px)/2)) 28px; }.fo
 }
 .faq-section .eyebrow { font-size:16px; }
 .support-section .support-icon { margin-bottom:0; }
-.support-card { padding-bottom:33px; margin-left:144px; margin-right:136px; }
+.support-card { padding-bottom:33px; margin-left:auto; margin-right:auto; display:flex; flex-direction:column; align-items:center; text-align:center; }
 .hero h1 b.hero-wordmark-accent { font-style:italic; color:#59030a; }
 .hero-tagline em { font-style:italic; color:#91101b; }
 .hero-logo.hero-logo-refined { font-size:18px; font-family:system-ui; object-fit:scale-down; margin-left:189.531px; margin-right:184px; box-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25); }
