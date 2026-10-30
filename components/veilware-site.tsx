@@ -21,9 +21,9 @@ const features = [
 ]
 
 const products = [
-  { icon: Box, title: 'Roblox Executor', copy: 'A Roblox executor for running scripts in game with a straight forward UI for exploiting in your favorite games.' },
-  { icon: Sparkles, title: 'Fortnite External', copy: 'An external Fortnite cheat with its own interface and features being finalised ahead of release.' },
-  { icon: Bell, title: 'Temp Spoofer', copy: 'A temporary system spoofer designed to change a device identifiers for a session, without making permanent changes to your setup.' },
+  { icon: Box, title: 'Roblox Executor', copy: 'Our premium roblox executor for exploting in your favorite games' },
+  { icon: Sparkles, title: 'Fortnite External', copy: 'Our premium fortnite external most ud out there' },
+  { icon: Bell, title: 'Temp Spoofer', copy: 'Our temporary spoofer to get yourself temporarily unhardware banned' },
 ]
 
 const faqs = [
