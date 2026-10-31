@@ -23,7 +23,7 @@ button { cursor:pointer; }
 .nav-wrap { width:min(1180px,calc(100% - 48px)); height:72px; margin:auto; display:flex; align-items:center; justify-content:space-between; gap:66px; }
 .christmas-countdown { display:grid; justify-items:center; gap:4px; min-width:168px; margin-left:auto; padding:10px 18px 11px; border:1px solid rgba(255,88,105,.28); border-radius:10px; background:linear-gradient(135deg,rgba(117,24,38,.34),rgba(16,18,23,.6)); box-shadow:0 0 18px rgba(255,51,74,.08), inset 0 1px rgba(255,255,255,.06); }
 .christmas-countdown-label { color:#ff8994; font-size:12px; font-weight:700; letter-spacing:.16em; line-height:1; text-transform:uppercase; }
-.christmas-countdown-value { color:#f4f5f7; font-family:var(--font-mono, ui-monospace, monospace); font-size:24px; font-variant-numeric:tabular-nums; letter-spacing:.04em; line-height:1; white-space:nowrap; }
+.christmas-countdown-value { color:#f4f5f7; font-family:var(--font-mono, ui-monospace, monospace); font-size:20px; font-variant-numeric:tabular-nums; letter-spacing:.04em; line-height:1; white-space:nowrap; }
 .christmas-countdown-value b { font-weight:700; }.christmas-countdown-value i { margin:0 2px; color:#ff6574; font-style:normal; }
 @media (max-width:800px) { .christmas-countdown { display:none; } }
 .brand { color:var(--white); display:flex; align-items:center; gap:10px; text-decoration:none; font-weight:800; font-size:20px; letter-spacing:2px; }.brand img { width:30px; height:30px; object-fit:contain; border-radius:7px; mix-blend-mode:screen; }.discord img { width:17px; height:17px; object-fit:contain; mix-blend-mode:screen; }
