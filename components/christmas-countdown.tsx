@@ -1,42 +1,27 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-
-function getTargetDate(now = new Date()) {
-  const target = new Date(now.getFullYear(), 11, 25, 0, 0, 0)
-  if (now > target) target.setFullYear(target.getFullYear() + 1)
-  return target
-}
-
-function getRemaining(target: Date) {
-  const total = Math.max(0, target.getTime() - Date.now())
-  return {
-    days: Math.floor(total / 86400000),
-    hours: Math.floor((total / 3600000) % 24),
-    minutes: Math.floor((total / 60000) % 60),
-    seconds: Math.floor((total / 1000) % 60),
-  }
-}
+import { getChristmasRemaining, getChristmasTime } from './christmas-time'
 
 const pad = (value: number) => String(value).padStart(2, '0')
 
 export function ChristmasCountdown() {
-  const [target, setTarget] = useState<Date | null>(null)
-  const [remaining, setRemaining] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+  const [time, setTime] = useState<ReturnType<typeof getChristmasTime> | null>(null)
 
   useEffect(() => {
-    const nextChristmas = getTargetDate()
-    setTarget(nextChristmas)
-    setRemaining(getRemaining(nextChristmas))
-    const interval = window.setInterval(() => {
-      const nextTarget = getTargetDate()
-      setTarget(nextTarget)
-      setRemaining(getRemaining(nextTarget))
-    }, 1000)
-    return () => window.clearInterval(interval)
+    const update = () => setTime(getChristmasTime(new Date()))
+    update()
+    const interval = window.setInterval(update, 1000)
+    const handleVisibility = () => { if (document.visibilityState === 'visible') update() }
+    document.addEventListener('visibilitychange', handleVisibility)
+    return () => {
+      window.clearInterval(interval)
+      document.removeEventListener('visibilitychange', handleVisibility)
+    }
   }, [])
 
-  if (!target) return null
+  if (!time) return null
+  const remaining = getChristmasRemaining(time)
 
   return (
     <div className="christmas-countdown" aria-label={`Countdown to Christmas: ${remaining.days} days, ${remaining.hours} hours, ${remaining.minutes} minutes, ${remaining.seconds} seconds`}>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { getChristmasTime } from './christmas-time'
 
 const snowflakes = Array.from({ length: 22 }, (_, index) => ({
   left: `${(index * 47) % 100}%`,
@@ -12,15 +13,26 @@ const snowflakes = Array.from({ length: 22 }, (_, index) => ({
 export function ChristmasOverlay() {
   const [visible, setVisible] = useState(false)
   const [dismissing, setDismissing] = useState(false)
+  const [dismissed, setDismissed] = useState(false)
 
   useEffect(() => {
-    const today = new Date()
-    if (today.getMonth() === 11 && today.getDate() === 25) setVisible(true)
-  }, [])
+    const syncChristmasDay = () => {
+      const isChristmasDay = getChristmasTime(new Date()).isChristmasDay
+      setVisible(isChristmasDay && !dismissed)
+    }
+    syncChristmasDay()
+    const interval = window.setInterval(syncChristmasDay, 1000)
+    const handleVisibility = () => { if (document.visibilityState === 'visible') syncChristmasDay() }
+    document.addEventListener('visibilitychange', handleVisibility)
+    return () => {
+      window.clearInterval(interval)
+      document.removeEventListener('visibilitychange', handleVisibility)
+    }
+  }, [dismissed])
 
   useEffect(() => {
     if (!visible) return
-    const dismiss = () => setDismissing(true)
+    const dismiss = () => setDismissing((current) => current || true)
     window.addEventListener('keydown', dismiss, { once: true })
     return () => window.removeEventListener('keydown', dismiss)
   }, [visible])
@@ -35,7 +47,10 @@ export function ChristmasOverlay() {
       aria-label="Christmas greeting"
       onClick={() => setDismissing(true)}
       onAnimationEnd={(event) => {
-        if (dismissing && event.animationName === 'christmas-dismiss') setVisible(false)
+        if (dismissing && event.animationName === 'christmas-dismiss') {
+          setDismissed(true)
+          setVisible(false)
+        }
       }}
     >
       <div className="christmas-backdrop" aria-hidden="true" />
