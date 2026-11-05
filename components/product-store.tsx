@@ -12,7 +12,7 @@ function ProductArtwork({ product, large = false }: { product: (typeof products)
 }
 
 export function ProductCard({ product }: { product: (typeof products)[number] }) {
-  return <Link className="store-product-card" href={`/products/${product.slug}`}><ProductArtwork product={product} /><div className="store-product-copy"><div className="store-card-meta"><span>{product.category}</span><strong>{product.availability}</strong></div><h2>{product.title}</h2><p>{product.description}</p><div className="store-card-footer"><span>Pricing announced soon</span><span className="card-arrow">↗</span></div></div></Link>
+  return <Link className="store-product-card" href={`/products/${product.slug}`}><ProductArtwork product={product} /><div className="store-product-copy"><div className="store-card-meta"><span>{product.category}</span><strong>{product.availability}</strong></div><h2>{product.title}</h2><p>{product.description}</p><div className="store-card-footer"><span>{product.cardFooter ?? 'Pricing announced soon'}</span><span className="card-arrow">↗</span></div></div></Link>
 }
 
 export function ProductCatalogue() {
