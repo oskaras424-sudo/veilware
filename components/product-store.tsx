@@ -5,10 +5,14 @@ import { useMemo, useState } from 'react'
 import { Bell, Box, Check, ChevronDown, Search, SlidersHorizontal, Sparkles } from 'lucide-react'
 import { products } from '@/lib/products'
 
+function ProductIcon({ name, size }: { name: (typeof products)[number]['icon']; size: number }) {
+  if (name === 'box') return <Box size={size} strokeWidth={1.4} />
+  if (name === 'sparkles') return <Sparkles size={size} strokeWidth={1.4} />
+  return <Bell size={size} strokeWidth={1.4} />
+}
+
 function ProductArtwork({ product, large = false }: { product: (typeof products)[number]; large?: boolean }) {
-  const iconProps = { size: large ? 42 : 28, strokeWidth: 1.4 }
-  const icon = product.icon === 'box' ? <Box {...iconProps} /> : product.icon === 'sparkles' ? <Sparkles {...iconProps} /> : <Bell {...iconProps} />
-  return <div className={`product-artwork ${large ? 'large' : ''}`}><div className="artwork-grid" /><div className="artwork-mark">{icon}</div><span>{product.imageLabel}</span><i>{product.category}</i></div>
+  return <div className={`product-artwork ${large ? 'large' : ''}`}><div className="artwork-grid" /><div className="artwork-mark"><ProductIcon name={product.icon} size={large ? 42 : 28} /></div><span>{product.imageLabel}</span><i>{product.category}</i></div>
 }
 
 export function ProductCard({ product }: { product: (typeof products)[number] }) {
