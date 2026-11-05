@@ -1,20 +1,18 @@
 import { notFound } from 'next/navigation'
 import { ProductDetail } from '@/components/product-detail'
-import { getProduct, products } from '@/lib/products'
+import { getProductBySlug } from '@/lib/supabase/products'
 
-export function generateStaticParams() {
-  return products.map((product) => ({ slug: product.slug }))
-}
+export const dynamic = 'force-dynamic'
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const product = getProduct(slug)
+  const product = await getProductBySlug(slug)
   return { title: product ? `${product.title} | Veilware` : 'Product | Veilware', description: product?.description }
 }
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const product = getProduct(slug)
+  const product = await getProductBySlug(slug)
   if (!product) notFound()
   return <ProductDetail product={product} />
 }
