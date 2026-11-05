@@ -1,15 +1,14 @@
 'use client'
 
 import Link from 'next/link'
-import { createElement, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Bell, Box, Check, ChevronDown, Search, SlidersHorizontal, Sparkles } from 'lucide-react'
-import { products, type ProductIconName } from '@/lib/products'
-
-const productIcons: Record<ProductIconName, typeof Box> = { box: Box, sparkles: Sparkles, bell: Bell }
+import { products } from '@/lib/products'
 
 function ProductArtwork({ product, large = false }: { product: (typeof products)[number]; large?: boolean }) {
-  const Icon = productIcons[product.icon]
-  return <div className={`product-artwork ${large ? 'large' : ''}`}><div className="artwork-grid" /><div className="artwork-mark">{createElement(Icon, { size: large ? 42 : 28, strokeWidth: 1.4 })}</div><span>{product.imageLabel}</span><i>{product.category}</i></div>
+  const iconProps = { size: large ? 42 : 28, strokeWidth: 1.4 }
+  const icon = product.icon === 'box' ? <Box {...iconProps} /> : product.icon === 'sparkles' ? <Sparkles {...iconProps} /> : <Bell {...iconProps} />
+  return <div className={`product-artwork ${large ? 'large' : ''}`}><div className="artwork-grid" /><div className="artwork-mark">{icon}</div><span>{product.imageLabel}</span><i>{product.category}</i></div>
 }
 
 export function ProductCard({ product }: { product: (typeof products)[number] }) {
