@@ -15,6 +15,16 @@ export async function POST(request: Request) {
     password,
     options: { captchaToken, emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ?? `${new URL(request.url).origin}/auth/callback` },
   })
-  if (error) return NextResponse.json({ error: error.message.includes('already') ? 'Unable to create this account.' : 'Unable to create your account right now.' }, { status: 400 })
+  if (error) {
+    console.error('[auth.signup]', { operation: 'signUp', message: error.message, code: error.code ?? null, status: error.status ?? 400 })
+    const normalized = `${error.code ?? ''} ${error.message}`.toLowerCase()
+    let message = 'Unable to create your account right now.'
+    if (normalized.includes('captcha')) message = 'CAPTCHA verification failed. Please complete the CAPTCHA again.'
+    else if (normalized.includes('already') || normalized.includes('registered') || normalized.includes('exists')) message = 'Unable to create this account.'
+    else if (normalized.includes('password') || normalized.includes('weak')) message = 'Choose a stronger password and try again.'
+    else if (normalized.includes('email') && normalized.includes('invalid')) message = 'Enter a valid email address.'
+    else if (error.status === 429 || normalized.includes('rate')) message = 'Too many attempts. Please wait and try again.'
+    return NextResponse.json({ error: message }, { status: error.status && error.status >= 400 ? error.status : 400 })
+  }
   return NextResponse.json({ needsEmailConfirmation: !data.session })
 }
