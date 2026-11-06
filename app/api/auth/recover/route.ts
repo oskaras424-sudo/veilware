@@ -9,9 +9,10 @@ export async function POST(request: Request) {
   }
 
   const supabase = await createClient()
-  await supabase.auth.resetPasswordForEmail(email, {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
     captchaToken,
     redirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ?? `${new URL(request.url).origin}/auth/callback?next=/auth/reset-password`,
   })
+  if (error) return NextResponse.json({ error: 'Unable to send a reset link right now.' }, { status: 400 })
   return NextResponse.json({ ok: true })
 }
