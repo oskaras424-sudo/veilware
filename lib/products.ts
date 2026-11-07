@@ -6,6 +6,7 @@ export type ProductVariant = {
   currency: string
   isActive: boolean
   available: boolean
+  stockQuantity: number
   availability: string
 }
 

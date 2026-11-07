@@ -30,7 +30,7 @@ export function ProductCatalogue() {
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('All products')
   const [inStockOnly, setInStockOnly] = useState(false)
-  const { data, error, isLoading } = useSWR('/api/products', fetcher)
+  const { data, error, isLoading } = useSWR('/api/products', fetcher, { refreshInterval: 30000, revalidateOnFocus: true })
   const products = data?.products ?? []
   const categories = ['All products', ...new Set(products.map((product) => product.category))]
   const filteredProducts = useMemo(() => products.filter((product) => {
