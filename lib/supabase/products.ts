@@ -65,6 +65,7 @@ function normalizeProduct(row: ProductRow, stockByVariantId: Map<string, number>
     id: row.id,
     slug: row.slug,
     title: row.name,
+    isActive: row.is_active === true,
     description: row.description ?? '',
     longDescription: row.description ?? '',
     imageUrl: row.image_url,
@@ -73,7 +74,8 @@ function normalizeProduct(row: ProductRow, stockByVariantId: Map<string, number>
     availability: hasStock ? 'IN STOCK' : 'OUT OF STOCK',
     cardFooter: hasConfiguredPrice
       ? `${formatPrice(variants.find((variant) => variant.priceMinor !== null)?.priceMinor ?? 0, variants.find((variant) => variant.priceMinor !== null)?.currency ?? 'GBP')} · ${hasStock ? `${variants.find((variant) => variant.available)?.stockQuantity ?? 0} keys available` : 'OUT OF STOCK'}`
-      : `PRICE COMING SOON · ${hasStock ? `${variants.reduce((total, variant) => total + variant.stockQuantity, 0)} keys available` : 'OUT OF STOCK'}`, 
+      : `PRICE COMING SOON · ${hasStock ? `${variants.reduce((total, variant) => total + variant.stockQuantity, 0)} keys available` : 'OUT OF STOCK'}`,
+    additionalInformation: [],
     variants,
   }
 }

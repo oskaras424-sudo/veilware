@@ -15,6 +15,7 @@ export type Product = {
   id: string
   slug: string
   title: string
+  isActive: boolean
   description: string
   longDescription: string
   imageUrl: string | null
@@ -22,6 +23,7 @@ export type Product = {
   imageLabel: string
   availability: string
   cardFooter: string
+  additionalInformation: string[]
   variants: ProductVariant[]
 }
 
