@@ -7,6 +7,7 @@ export type ProductVariant = {
   isActive: boolean
   available: boolean
   stockQuantity: number
+  available_stock: number
   availability: string
 }
 

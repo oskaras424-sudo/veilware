@@ -18,6 +18,7 @@ type PublicStockRow = {
   available_quantity?: number | null
   available_count?: number | null
   stock_count?: number | null
+  available_stock?: number | null
   quantity?: number | null
 }
 
@@ -50,6 +51,7 @@ function normalizeVariant(variant: ProductVariantRow, stockByVariantId: Map<stri
     isActive,
     available: isActive && hasPrice && stockQuantity > 0,
     stockQuantity,
+    available_stock: stockQuantity,
     availability: stockQuantity > 0 ? 'IN STOCK' : 'OUT OF STOCK',
   }
 }
@@ -57,7 +59,7 @@ function normalizeVariant(variant: ProductVariantRow, stockByVariantId: Map<stri
 function normalizeProduct(row: ProductRow, stockByVariantId: Map<string, number>): Product {
   const variants = (row.product_variants ?? []).filter((variant) => variant.is_active === true).map((variant) => normalizeVariant(variant, stockByVariantId))
   const hasConfiguredPrice = variants.some((variant) => variant.priceMinor !== null)
-  const hasStock = variants.some((variant) => variant.available)
+  const hasStock = variants.some((variant) => variant.stockQuantity > 0)
   const category = row.slug.split('-')[0]?.toUpperCase() || 'VEILWARE'
   return {
     id: row.id,
@@ -71,7 +73,7 @@ function normalizeProduct(row: ProductRow, stockByVariantId: Map<string, number>
     availability: hasStock ? 'IN STOCK' : 'OUT OF STOCK',
     cardFooter: hasConfiguredPrice
       ? `${formatPrice(variants.find((variant) => variant.priceMinor !== null)?.priceMinor ?? 0, variants.find((variant) => variant.priceMinor !== null)?.currency ?? 'GBP')} · ${hasStock ? `${variants.find((variant) => variant.available)?.stockQuantity ?? 0} keys available` : 'OUT OF STOCK'}`
-      : 'PRICE COMING SOON',
+      : `PRICE COMING SOON · ${hasStock ? `${variants.reduce((total, variant) => total + variant.stockQuantity, 0)} keys available` : 'OUT OF STOCK'}`, 
     variants,
   }
 }
@@ -82,7 +84,7 @@ async function getStockByVariantId(supabase: Awaited<ReturnType<typeof createCli
 
   return new Map((data as PublicStockRow[] ?? []).flatMap((row) => {
     const variantId = row.variant_id ?? row.product_variant_id ?? row.id
-    const quantity = row.available_quantity ?? row.available_count ?? row.stock_count ?? row.quantity ?? 0
+    const quantity = row.available_stock ?? row.available_quantity ?? row.available_count ?? row.stock_count ?? row.quantity ?? 0
     return variantId ? [[variantId, Math.max(0, Number(quantity))] as const] : []
   }))
 }
