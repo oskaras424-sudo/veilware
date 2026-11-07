@@ -7,8 +7,9 @@ import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile'
 
 type AuthMode = 'login' | 'signup' | 'recover'
 
-export function AuthForm({ mode }: { mode: AuthMode }) {
+export function AuthForm({ mode, nextPath }: { mode: AuthMode; nextPath?: string }) {
   const router = useRouter()
+  const safeReturnPath = nextPath?.startsWith('/') && !nextPath.startsWith('//') ? nextPath : '/account'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [token, setToken] = useState('')
@@ -27,7 +28,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       const result = await response.json() as { error?: string; needsEmailConfirmation?: boolean }
       if (!response.ok) throw new Error(result.error ?? 'Something went wrong.')
       if (isRecover || result.needsEmailConfirmation) router.push('/auth/check-email')
-      else router.push('/account')
+      else router.push(mode === 'login' ? safeReturnPath : '/account')
       router.refresh()
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Something went wrong.')

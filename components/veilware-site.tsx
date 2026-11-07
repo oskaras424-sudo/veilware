@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import { MagneticPanel, useMagneticPanel } from './magnetic-panel'
 import { ChristmasOverlay } from './christmas-overlay'
 import { ChristmasCountdown } from './christmas-countdown'
+import { AuthNav } from './auth-nav'
 import { ArrowDown, ArrowRight, Bell, ChevronDown, Code2, Cpu, EyeOff, Headphones, LockKeyhole, Menu, RefreshCw, ShieldCheck, Zap } from 'lucide-react'
 
 const crimson = '#ff334a'
@@ -51,7 +52,7 @@ function Logo() {
   return <div ref={setRefs} className={`reveal ${magnetic ? 'magnetic-panel' : ''} ${className}`}>{children}</div>
  }
 
-export default function VeilwareSite() {
+export default function VeilwareSite({ signedIn = false }: { signedIn?: boolean }) {
   const [activeFaq, setActiveFaq] = useState<number | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState('home')
@@ -129,7 +130,7 @@ export default function VeilwareSite() {
   }
 
   return <main className="veilware-site"><ChristmasOverlay />
-    <header className="site-header"><div className="nav-wrap"><Logo /><nav className={menuOpen ? 'open' : ''} aria-label="Main navigation">{[['home','Home'],['features','Features']].map(([id, label]) => <button key={id} className={activeSection === id ? 'active' : ''} aria-current={activeSection === id ? 'location' : undefined} onClick={(event) => go(id, event.currentTarget)}>{label}</button>)}<Link className="products-nav-link" href="/products">Products</Link><Link className="account-nav-link" href="/account">Account</Link>{[['updates','Updates'],['faq','FAQ'],['support','Support']].map(([id, label]) => <button key={id} className={activeSection === id ? 'active' : ''} aria-current={activeSection === id ? 'location' : undefined} onClick={(event) => go(id, event.currentTarget)}>{label}</button>)}</nav><ChristmasCountdown /><a className="discord small" href={DISCORD_INVITE} target="_blank" rel="noreferrer"> <img src={DISCORD_LOGO} alt="" /> <span>Join Discord</span></a><button className="menu-button" onClick={() => setMenuOpen(v => !v)} aria-label="Toggle menu"><Menu size={21} /></button></div></header>
+    <header className="site-header"><div className="nav-wrap"><Logo /><nav className={menuOpen ? 'open' : ''} aria-label="Main navigation">{[['home','Home'],['features','Features']].map(([id, label]) => <button key={id} className={activeSection === id ? 'active' : ''} aria-current={activeSection === id ? 'location' : undefined} onClick={(event) => go(id, event.currentTarget)}>{label}</button>)}<Link className="products-nav-link" href="/products">Products</Link><AuthNav signedIn={signedIn} />{[['updates','Updates'],['faq','FAQ'],['support','Support']].map(([id, label]) => <button key={id} className={activeSection === id ? 'active' : ''} aria-current={activeSection === id ? 'location' : undefined} onClick={(event) => go(id, event.currentTarget)}>{label}</button>)}</nav><ChristmasCountdown /><a className="discord small" href={DISCORD_INVITE} target="_blank" rel="noreferrer"> <img src={DISCORD_LOGO} alt="" /> <span>Join Discord</span></a><button className="menu-button" onClick={() => setMenuOpen(v => !v)} aria-label="Toggle menu"><Menu size={21} /></button></div></header>
 
     <section id="home" data-nav-section className={`hero ${activeSection === 'home' ? 'is-active' : ''}`}><div className="hero-effects" aria-hidden="true"><div className="orb orb-a" /><div className="orb orb-b" /></div><div className="hero-content"><img className="hero-logo hero-logo-refined" src={VEILWARE_LOGO} alt="Veilware logo" /><h1><span>VEIL</span><b className="hero-wordmark-accent">WARE</b></h1><p className="hero-tagline">Best <em>undetected</em> softwares.</p><p className="hero-copy">Welcome to the Veilware community. We build premium,<br className="desktop" /> undetected software with a relentless focus on quality, privacy, and performance.</p><div className="hero-actions"><a className="discord" href={DISCORD_INVITE} target="_blank" rel="noreferrer"><img src={DISCORD_LOGO} alt="" /> Join Our Discord</a><button className="outline-button" onClick={(event) => go('features', event.currentTarget)}>Explore <ArrowDown size={16} /></button></div><div className="trust"><ShieldCheck size={14} /> PRIVACY-FIRST <span>•</span> COMMUNITY-DRIVEN</div></div><button className="scroll-cue" onClick={() => go('features')} aria-label="Scroll to features"><span className="scroll-cue-dot" /></button></section>
 
