@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { ProductDetail } from '@/components/product-detail'
 import { getProductBySlug } from '@/lib/supabase/products'
+import { stripeModeIsTest } from '@/lib/stripe'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,5 +15,5 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const { slug } = await params
   const product = await getProductBySlug(slug)
   if (!product) notFound()
-  return <ProductDetail product={product} />
+  return <ProductDetail product={product} sandboxMode={stripeModeIsTest()} />
 }
