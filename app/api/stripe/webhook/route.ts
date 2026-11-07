@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { getStripe } from '@/lib/stripe'
+import { getStripe, stripeModeIsTest } from '@/lib/stripe'
 import { withTransaction } from '@/lib/db'
 
 export const runtime = 'nodejs'
 
-async function fulfillOrder(orderId: string, sessionId: string) {
+async function fulfillOrder(orderId: string, sessionId: string, sandboxMode: boolean) {
   return withTransaction(async (client) => {
     await client.query('select pg_advisory_xact_lock(hashtextextended($1, 0))', [sessionId])
     const { rows: orders } = await client.query<{ id: string; user_id: string; variant_id: string; status: string }>(
@@ -18,9 +18,9 @@ async function fulfillOrder(orderId: string, sessionId: string) {
 
     const { rows: inventory } = await client.query<{ id: string; license_key: string }>(
       `select id, license_key from public.license_key_inventory
-       where variant_id = $1 and status = 'available' and license_key not like 'TEST-%'
-       order by created_at asc, id asc limit 1 for update skip locked`,
-      [order.variant_id],
+       where variant_id = $1 and status = 'available' and ($2::boolean or license_key not like 'TEST-%')
+       order by case when $2::boolean and license_key like 'TEST-%' then 0 else 1 end, created_at asc, id asc limit 1 for update skip locked`
+      [order.variant_id, sandboxMode],
     )
     const key = inventory[0]
     if (!key) throw new Error('no_genuine_stock')
@@ -59,12 +59,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid webhook signature.' }, { status: 400 })
   }
 
-  if (event.type !== 'checkout.session.completed') return NextResponse.json({ received: true })
+  if (stripeModeIsTest() !== (event.livemode === false)) return NextResponse.json({ error: 'Stripe mode mismatch.' }, { status: 400 })
+  if (!['checkout.session.completed', 'checkout.session.async_payment_succeeded'].includes(event.type)) return NextResponse.json({ received: true })
   const session = event.data.object as Stripe.Checkout.Session
   if (session.payment_status !== 'paid' || !session.metadata?.order_id) return NextResponse.json({ received: true })
 
   try {
-    await fulfillOrder(session.metadata.order_id, session.id)
+    await fulfillOrder(session.metadata.order_id, session.id, event.livemode === false)
     return NextResponse.json({ received: true })
   } catch (error) {
     console.error('[stripe.webhook.fulfillment]', error instanceof Error ? error.message : 'unknown error')

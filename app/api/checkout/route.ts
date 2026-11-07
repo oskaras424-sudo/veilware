@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getProducts } from '@/lib/supabase/products'
-import { getStripe } from '@/lib/stripe'
+import { getStripe, stripeModeIsTest } from '@/lib/stripe'
 import { pool } from '@/lib/db'
 
 export async function POST(request: Request) {
@@ -13,10 +13,13 @@ export async function POST(request: Request) {
   const variantId = typeof body?.variantId === 'string' ? body.variantId : ''
   if (!variantId) return NextResponse.json({ error: 'Choose a product duration.' }, { status: 400 })
 
+  const stripe = getStripe()
+  const sandboxMode = stripeModeIsTest()
   const products = await getProducts()
   const product = products.find((item) => item.variants.some((variant) => variant.id === variantId))
   const variant = product?.variants.find((item) => item.id === variantId)
-  if (!product || !variant || variant.priceMinor === null || !product.isActive || !variant.isActive || variant.stockQuantity < 1) {
+  const unitAmount = variant?.priceMinor ?? (sandboxMode ? 100 : null)
+  if (!product || !variant || unitAmount === null || !product.isActive || !variant.isActive || variant.stockQuantity < 1) {
     return NextResponse.json({ error: 'This product duration is not available.' }, { status: 409 })
   }
 
@@ -27,13 +30,14 @@ export async function POST(request: Request) {
   )
 
   try {
-    const session = await getStripe().checkout.sessions.create({
+    const session = await stripe.checkout.sessions.create({
       mode: 'payment',
-      line_items: [{ price_data: { currency: variant.currency.toLowerCase(), product_data: { name: `${product.title} — ${variant.name}` }, unit_amount: variant.priceMinor }, quantity: 1 }],
+      managed_payments: { enabled: false },
+      line_items: [{ price_data: { currency: variant.currency.toLowerCase(), product_data: { name: `${product.title} — ${variant.name}${sandboxMode && variant.priceMinor === null ? ' (Sandbox £1 test price)' : ''}` }, unit_amount: unitAmount }, quantity: 1 }],
       success_url: `${new URL('/account?checkout=success', request.url).toString()}`,
       cancel_url: `${new URL(`/products/${product.slug}`, request.url).toString()}`,
       client_reference_id: order.rows[0].id,
-      metadata: { order_id: order.rows[0].id, variant_id: variant.id, user_id: user.id },
+      metadata: { order_id: order.rows[0].id, variant_id: variant.id, user_id: user.id, sandbox_price_override: sandboxMode && variant.priceMinor === null ? 'true' : 'false' },
     }, { idempotencyKey: `checkout_${order.rows[0].id}` })
     await pool.query('update public.orders set provider_payment_id = $1 where id = $2', [session.id, order.rows[0].id])
     return NextResponse.json({ url: session.url })

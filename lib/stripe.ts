@@ -5,3 +5,7 @@ export function getStripe() {
   if (!key) throw new Error('STRIPE_SECRET_KEY is not configured')
   return new Stripe(key)
 }
+
+export function stripeModeIsTest() {
+  return process.env.STRIPE_SECRET_KEY?.startsWith('sk_test_') === true
+}
