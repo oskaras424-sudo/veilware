@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import useSWR from 'swr'
 import { useMemo, useState } from 'react'
-import { Bell, Box, Check, ChevronDown, Search, SlidersHorizontal, Sparkles } from 'lucide-react'
+import { Check, ChevronDown, Search, SlidersHorizontal } from 'lucide-react'
 import type { Product, ProductApiResponse } from '@/lib/products'
 
 const fetcher = async (url: string): Promise<ProductApiResponse> => {
@@ -12,14 +12,10 @@ const fetcher = async (url: string): Promise<ProductApiResponse> => {
   return response.json()
 }
 
-function ProductIcon({ slug, size }: { slug: string; size: number }) {
-  if (slug.includes('roblox')) return <Box size={size} strokeWidth={1.4} />
-  if (slug.includes('fortnite')) return <Sparkles size={size} strokeWidth={1.4} />
-  return <Bell size={size} strokeWidth={1.4} />
-}
+const VEILWARE_PRODUCT_IMAGE = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/eKXDEcLWzqlMPRNN-YKRINyYBexK5xmabd6PPKiKuvoNc91.png'
 
 function ProductArtwork({ product, large = false }: { product: Product; large?: boolean }) {
-  return <div className={`product-artwork ${large ? 'large' : ''}`}><div className="artwork-grid" /><div className="artwork-mark"><ProductIcon slug={product.slug} size={large ? 42 : 28} /></div><span>{product.imageLabel}</span><i>{product.category}</i></div>
+  return <div className={`product-artwork ${large ? 'large' : ''}`}><img className="product-artwork-image" src={product.imageUrl ?? VEILWARE_PRODUCT_IMAGE} alt={`${product.title} product artwork`} /><div className="artwork-grid" /><span>{product.imageLabel}</span><i>{product.category}</i></div>
 }
 
 export function ProductCard({ product }: { product: Product }) {
@@ -30,7 +26,7 @@ export function ProductCatalogue() {
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('All products')
   const [inStockOnly, setInStockOnly] = useState(false)
-  const { data, error, isLoading } = useSWR('/api/products', fetcher)
+  const { data, error, isLoading } = useSWR('/api/products', fetcher, { refreshInterval: 30000, revalidateOnFocus: true })
   const products = data?.products ?? []
   const categories = ['All products', ...new Set(products.map((product) => product.category))]
   const filteredProducts = useMemo(() => products.filter((product) => {
