@@ -5,43 +5,68 @@ import { withTransaction } from '@/lib/db'
 
 export const runtime = 'nodejs'
 
-async function fulfillOrder(orderId: string, sessionId: string, sandboxMode: boolean) {
+async function fulfillOrder(session: Stripe.Checkout.Session, sandboxMode: boolean) {
+  const orderId = session.metadata?.order_id
+  if (!orderId) throw new Error('order_not_found')
+
   return withTransaction(async (client) => {
-    await client.query('select pg_advisory_xact_lock(hashtextextended($1, 0))', [sessionId])
-    const { rows: orders } = await client.query<{ id: string; user_id: string; variant_id: string; status: string }>(
-      'select id, user_id, variant_id, status from public.orders where id = $1 for update',
+    await client.query('select pg_advisory_xact_lock(hashtextextended($1, 0))', [session.id])
+    const { rows: orders } = await client.query<{
+      id: string
+      user_id: string
+      variant_id: string
+      status: string
+      payment_provider: string
+      provider_payment_id: string | null
+    }>(
+      'select id, user_id, variant_id, status, payment_provider, provider_payment_id from public.orders where id = $1 for update',
       [orderId],
     )
     const order = orders[0]
     if (!order) throw new Error('order_not_found')
+    if (
+      order.payment_provider !== 'stripe' ||
+      order.provider_payment_id !== session.id ||
+      session.client_reference_id !== order.id ||
+      session.metadata?.variant_id !== order.variant_id ||
+      session.metadata?.user_id !== order.user_id
+    ) throw new Error('order_payment_mismatch')
     if (order.status === 'paid') return 'already_fulfilled'
+    if (order.status !== 'pending') throw new Error('order_not_payable')
 
     const { rows: inventory } = await client.query<{ id: string; license_key: string }>(
       `select id, license_key from public.license_key_inventory
-       where variant_id = $1 and status = 'available' and ($2::boolean or license_key not like 'TEST-%')
-       order by case when $2::boolean and license_key like 'TEST-%' then 0 else 1 end, created_at asc, id asc limit 1 for update skip locked`
+       where variant_id = $1 and status = 'available'
+         and (($2::boolean and license_key like 'TEST-%') or (not $2::boolean and license_key not like 'TEST-%'))
+       order by created_at asc, id asc limit 1 for update skip locked`,
       [order.variant_id, sandboxMode],
     )
     const key = inventory[0]
-    if (!key) throw new Error('no_genuine_stock')
+    if (!key) throw new Error('no_matching_stock')
 
-    await client.query(
+    const { rowCount } = await client.query(
       `update public.license_key_inventory
-       set status = 'assigned', order_id = $1, user_id = $2, issued_at = now()
-       where id = $3`,
-      [order.id, order.user_id, key.id],
+       set status = 'issued', order_id = $1, user_id = $2, issued_at = now()
+       where id = $3 and variant_id = $4 and status = 'available'
+         and (($5::boolean and license_key like 'TEST-%') or (not $5::boolean and license_key not like 'TEST-%'))
+       returning id`,
+      [order.id, order.user_id, key.id, order.variant_id, sandboxMode],
     )
+    if (rowCount !== 1) throw new Error('inventory_assignment_conflict')
+
     await client.query(
       `insert into public.licenses (order_id, user_id, license_key, status)
        values ($1, $2, $3, 'active')`,
       [order.id, order.user_id, key.license_key],
     )
-    await client.query(
+    const { rowCount: paidOrderCount } = await client.query(
       `update public.orders
        set status = 'paid', payment_provider = 'stripe', provider_payment_id = $1, paid_at = now()
-       where id = $2`,
-      [sessionId, order.id],
+       where id = $2 and status = 'pending' and payment_provider = 'stripe' and provider_payment_id = $1
+       returning id`,
+      [session.id, order.id],
     )
+    if (paidOrderCount !== 1) throw new Error('order_update_conflict')
     return 'fulfilled'
   })
 }
@@ -65,7 +90,7 @@ export async function POST(request: Request) {
   if (session.payment_status !== 'paid' || !session.metadata?.order_id) return NextResponse.json({ received: true })
 
   try {
-    await fulfillOrder(session.metadata.order_id, session.id, event.livemode === false)
+    await fulfillOrder(session, event.livemode === false)
     return NextResponse.json({ received: true })
   } catch (error) {
     console.error('[stripe.webhook.fulfillment]', error instanceof Error ? error.message : 'unknown error')
