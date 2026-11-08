@@ -34,8 +34,8 @@ async function fulfillOrder(session: Stripe.Checkout.Session, sandboxMode: boole
     if (order.status === 'paid') return 'already_fulfilled'
     if (order.status !== 'pending') throw new Error('order_not_payable')
 
-    const { rows: inventory } = await client.query<{ id: string; license_key: string }>(
-      `select id, license_key from public.license_key_inventory
+    const { rows: inventory } = await client.query<{ id: string; license_key: string; validity_duration: string }>(
+      `select id, license_key, validity_duration from public.license_key_inventory
        where variant_id = $1 and status = 'available'
          and (($2::boolean and license_key like 'TEST-%') or (not $2::boolean and license_key not like 'TEST-%'))
        order by created_at asc, id asc limit 1 for update skip locked`,
@@ -55,9 +55,9 @@ async function fulfillOrder(session: Stripe.Checkout.Session, sandboxMode: boole
     if (rowCount !== 1) throw new Error('inventory_assignment_conflict')
 
     await client.query(
-      `insert into public.licenses (order_id, user_id, license_key, status)
-       values ($1, $2, $3, 'active')`,
-      [order.id, order.user_id, key.license_key],
+      `insert into public.licenses (order_id, user_id, license_key, status, validity_duration, expires_at)
+       values ($1, $2, $3, 'active', $4, null)`,
+      [order.id, order.user_id, key.license_key, key.validity_duration],
     )
     const { rowCount: paidOrderCount } = await client.query(
       `update public.orders

@@ -1,6 +1,7 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
+import './owner/owner.css'
 import { AmbientSquareField } from '@/components/ambient-square-field'
 
 export const metadata: Metadata = {
