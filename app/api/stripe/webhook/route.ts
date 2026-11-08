@@ -19,7 +19,7 @@ async function fulfillOrder(orderId: string, sessionId: string, sandboxMode: boo
     const { rows: inventory } = await client.query<{ id: string; license_key: string }>(
       `select id, license_key from public.license_key_inventory
        where variant_id = $1 and status = 'available' and ($2::boolean or license_key not like 'TEST-%')
-       order by case when $2::boolean and license_key like 'TEST-%' then 0 else 1 end, created_at asc, id asc limit 1 for update skip locked`
+       order by case when $2::boolean and license_key like 'TEST-%' then 0 else 1 end, created_at asc, id asc limit 1 for update skip locked`,
       [order.variant_id, sandboxMode],
     )
     const key = inventory[0]
