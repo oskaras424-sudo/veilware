@@ -7,7 +7,7 @@ export async function GET() {
 
   const [orders, licenses, ordersCount, licensesCount, inventory, availableInventory, products, variants] = await Promise.all([
     supabase.from('orders').select('id, variant_id, quantity, status, created_at, user_id').order('created_at', { ascending: false }).limit(8),
-    supabase.from('licenses').select('id, order_id, user_id, license_key, status, issued_at, expires_at').order('issued_at', { ascending: false }).limit(8),
+    supabase.from('licenses').select('id, order_id, user_id, license_key, status, validity_duration, activated_at, issued_at, expires_at').order('issued_at', { ascending: false }).limit(8),
     supabase.from('orders').select('id', { count: 'exact', head: true }),
     supabase.from('licenses').select('id', { count: 'exact', head: true }),
     supabase.from('license_key_inventory').select('id', { count: 'exact', head: true }),

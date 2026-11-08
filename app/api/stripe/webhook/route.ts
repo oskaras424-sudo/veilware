@@ -16,10 +16,9 @@ async function fulfillOrder(orderId: string, sessionId: string, sandboxMode: boo
     if (!order) throw new Error('order_not_found')
     if (order.status === 'paid') return 'already_fulfilled'
 
-    const { rows: inventory } = await client.query<{ id: string; license_key: string; expires_at: string | null }>(
-      `select id, license_key, expires_at from public.license_key_inventory
+    const { rows: inventory } = await client.query<{ id: string; license_key: string; validity_duration: string }>(
+      `select id, license_key, validity_duration from public.license_key_inventory
        where variant_id = $1 and status = 'available'
-         and (expires_at is null or expires_at > now())
          and ($2::boolean or license_key not like 'TEST-%')
        order by case when $2::boolean and license_key like 'TEST-%' then 0 else 1 end, created_at asc, id asc limit 1 for update skip locked`,
       [order.variant_id, sandboxMode],
@@ -34,9 +33,9 @@ async function fulfillOrder(orderId: string, sessionId: string, sandboxMode: boo
       [order.id, order.user_id, key.id],
     )
     await client.query(
-      `insert into public.licenses (order_id, user_id, license_key, status, expires_at)
-       values ($1, $2, $3, 'active', $4)`,
-      [order.id, order.user_id, key.license_key, key.expires_at],
+      `insert into public.licenses (order_id, user_id, license_key, status, validity_duration, expires_at)
+       values ($1, $2, $3, 'active', $4, null)`,
+      [order.id, order.user_id, key.license_key, key.validity_duration],
     )
     await client.query(
       `update public.orders

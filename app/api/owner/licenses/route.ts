@@ -7,7 +7,7 @@ export async function GET() {
 
   const { data, error } = await supabase
     .from('license_key_inventory')
-    .select('id, variant_id, license_key, status, created_at, issued_at, expires_at, order_id, user_id')
+    .select('id, variant_id, license_key, status, validity_duration, created_at, issued_at, expires_at, activated_at, order_id, user_id')
     .order('created_at', { ascending: false })
 
   if (error) return NextResponse.json({ error: 'Unable to load inventory.' }, { status: 500 })
@@ -25,14 +25,6 @@ export async function POST(request: Request) {
   if (!expiryPresets.includes(expiryPreset as (typeof expiryPresets)[number])) {
     return NextResponse.json({ error: 'Invalid expiry preset.' }, { status: 400 })
   }
-  const expiresAt = expiryPreset === 'never' ? null : new Date()
-  if (expiresAt) {
-    if (expiryPreset === '1_day') expiresAt.setUTCDate(expiresAt.getUTCDate() + 1)
-    if (expiryPreset === '1_week') expiresAt.setUTCDate(expiresAt.getUTCDate() + 7)
-    if (expiryPreset === '1_month') expiresAt.setUTCMonth(expiresAt.getUTCMonth() + 1)
-    if (expiryPreset === '3_months') expiresAt.setUTCMonth(expiresAt.getUTCMonth() + 3)
-    if (expiryPreset === '1_year') expiresAt.setUTCFullYear(expiresAt.getUTCFullYear() + 1)
-  }
   const licenseKeys = Array.isArray(body?.licenseKeys)
     ? (body.licenseKeys as unknown[]).filter((key: unknown): key is string => typeof key === 'string').map((key: string) => key.trim()).filter(Boolean)
     : []
@@ -45,7 +37,7 @@ export async function POST(request: Request) {
   }
 
   const uniqueKeys = [...new Set(licenseKeys)]
-  const rows = uniqueKeys.map((license_key) => ({ variant_id: variantId, license_key, status: 'available', expires_at: expiresAt?.toISOString() ?? null }))
+  const rows = uniqueKeys.map((license_key) => ({ variant_id: variantId, license_key, status: 'available', validity_duration: expiryPreset }))
   const { data, error } = await supabase.from('license_key_inventory').insert(rows).select('id, variant_id, license_key, status, created_at')
 
   if (error) return NextResponse.json({ error: 'Unable to add license keys. Check for duplicates and try again.' }, { status: 409 })
