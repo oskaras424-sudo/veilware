@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import './owner/owner.css'
 import { AmbientSquareField } from '@/components/ambient-square-field'
+import { OwnerFloatingButton } from '@/components/owner-floating-button'
 
 export const metadata: Metadata = {
   title: 'VEILWARE — Best Undetected Softwares',
@@ -27,7 +28,7 @@ export const viewport: Viewport = {
   ],
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
@@ -37,6 +38,7 @@ export default function RootLayout({
       <body className="antialiased">
         <AmbientSquareField />
         {children}
+        <OwnerFloatingButton />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
