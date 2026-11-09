@@ -10,7 +10,15 @@ export async function GET() {
     .select('id, variant_id, license_key, status, validity_duration, created_at, issued_at, expires_at, activated_at, order_id, user_id')
     .order('created_at', { ascending: false })
 
-  if (error) return NextResponse.json({ error: 'Unable to load inventory.' }, { status: 500 })
+  if (error) {
+    console.error('[v0] owner inventory query failed', {
+      code: error.code,
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+    })
+    return NextResponse.json({ error: 'Unable to load inventory.' }, { status: 500 })
+  }
   return NextResponse.json({ inventory: data ?? [] })
 }
 
