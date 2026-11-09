@@ -13,11 +13,19 @@ export async function GET() {
     supabase.from('license_key_inventory').select('id', { count: 'exact', head: true }),
     supabase.from('license_key_inventory').select('id', { count: 'exact', head: true }).eq('status', 'available'),
     supabase.from('products').select('id, name, slug, is_active').order('name'),
-    supabase.from('product_variants').select('id, product_id, name, duration, price_minor, currency, is_active').order('duration'),
+    supabase.from('product_variants').select('id, product_id, duration, price_minor, currency, is_active').order('duration'),
   ])
 
   const firstError = [orders, licenses, ordersCount, licensesCount, inventory, availableInventory, products, variants].find((result) => result.error)?.error
-  if (firstError) return NextResponse.json({ error: 'Unable to load owner data.' }, { status: 500 })
+  if (firstError) {
+    console.error('[v0] owner overview query failed', {
+      code: firstError.code,
+      message: firstError.message,
+      details: firstError.details,
+      hint: firstError.hint,
+    })
+    return NextResponse.json({ error: 'Unable to load owner data.' }, { status: 500 })
+  }
 
   return NextResponse.json({
     role,

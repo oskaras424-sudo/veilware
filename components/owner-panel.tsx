@@ -11,7 +11,7 @@ type Overview = {
   orders: Array<{ id: string; variant_id: string; quantity: number; status: string; created_at: string }>
   licenses: Array<{ id: string; license_key: string; status: string; validity_duration: string; activated_at: string | null; issued_at: string | null; expires_at: string | null }>
   products: Array<{ id: string; name: string; is_active: boolean }>
-  variants: Array<{ id: string; product_id: string; name: string; duration: string; price_minor: number | null; currency: string; is_active: boolean }>
+  variants: Array<{ id: string; product_id: string; duration: string; price_minor: number | null; currency: string; is_active: boolean }>
 }
 
 type InventoryItem = { id: string; variant_id: string; license_key: string; status: string; created_at: string; issued_at: string | null; expires_at: string | null; order_id: string | null }
@@ -64,7 +64,7 @@ export function OwnerPanel({ role }: OwnerPanelProps) {
   }
   if (isLoading || !data) return <main className="owner-page"><div className="owner-shell"><p className="store-eyebrow">VEILWARE OWNER PANEL</p><h1>Loading secure workspace…</h1></div></main>
 
-  const variantLabel = (id: string) => { const variant = data.variants.find((item) => item.id === id); const product = data.products.find((item) => item.id === variant?.product_id); return variant && product ? `${product.name} · ${variant.name}` : id }
+  const variantLabel = (id: string) => { const variant = data.variants.find((item) => item.id === id); const product = data.products.find((item) => item.id === variant?.product_id); return variant && product ? `${product.name} · ${variant.duration}` : id }
 
   return (
     <main className="owner-page">
